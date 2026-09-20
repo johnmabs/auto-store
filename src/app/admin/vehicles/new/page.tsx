@@ -1,4 +1,5 @@
 import { createVehicle } from "@/features/vehicles/vehicle.actions";
+import { VEHICLE_ORIGINS } from "@/features/vehicles/vehicle.constants";
 
 export default function NewVehiclePage() {
   return (
@@ -134,12 +135,22 @@ export default function NewVehiclePage() {
             Provenance et localisation
           </legend>
 
-          <input
+          <select
             name="originCountry"
-            placeholder="Pays de provenance"
             required
+            defaultValue=""
             className="w-full rounded-lg border px-3 py-2"
-          />
+          >
+            <option value="" disabled>
+              Pays de provenance
+            </option>
+
+            {VEHICLE_ORIGINS.map((origin) => (
+              <option key={origin.value} value={origin.value}>
+                {origin.label}
+              </option>
+            ))}
+          </select>
 
           <div className="grid gap-4 md:grid-cols-2">
             <select

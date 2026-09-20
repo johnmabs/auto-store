@@ -74,7 +74,7 @@ async function main() {
         doors: 5,
         seats: 7,
 
-        originCountry: "Japan",
+        originCountry: "JAPAN",
 
         locationStatus: "ABROAD",
         congoCity: null,
@@ -120,7 +120,7 @@ async function main() {
         doors: 5,
         seats: 5,
 
-        originCountry: "United States",
+        originCountry: "UNITED_STATES",
 
         locationStatus: "IN_TRANSIT",
         congoCity: null,
@@ -165,7 +165,7 @@ async function main() {
         doors: 5,
         seats: 5,
 
-        originCountry: "United States",
+        originCountry: "UNITED_STATES",
 
         locationStatus: "IN_CONGO",
         congoCity: "POINTE_NOIRE",
@@ -211,7 +211,7 @@ async function main() {
         doors: 4,
         seats: 5,
 
-        originCountry: "Germany",
+        originCountry: "GERMANY",
 
         locationStatus: "IN_CONGO",
         congoCity: "BRAZZAVILLE",
@@ -256,7 +256,7 @@ async function main() {
         doors: 5,
         seats: 5,
 
-        originCountry: "Germany",
+        originCountry: "GERMANY",
 
         locationStatus: "IN_CONGO",
         congoCity: "POINTE_NOIRE",

@@ -65,6 +65,16 @@ enum VehicleBodyType {
   OTHER
 }
 
+enum VehicleOrigin {
+  JAPAN
+  CHINA
+  UNITED_ARAB_EMIRATES
+  GERMANY
+  FRANCE
+  SOUTH_KOREA
+  UNITED_STATES
+}
+
 enum CustomerRequestStatus {
   NEW
   CONTACTED
@@ -93,7 +103,7 @@ model Vehicle {
   doors         Int?
   seats         Int?
 
-  originCountry String
+  originCountry VehicleOrigin
 
   locationStatus VehicleLocationStatus
   congoCity      CongoCity?
