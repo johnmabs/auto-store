@@ -6,3 +6,109 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+enum VehicleStatus {
+  DRAFT
+  AVAILABLE
+  RESERVED
+  SOLD
+}
+
+enum VehicleLocationStatus {
+  ABROAD
+  IN_TRANSIT
+  IN_CONGO
+}
+
+enum CongoCity {
+  POINTE_NOIRE
+  BRAZZAVILLE
+}
+
+enum Currency {
+  XAF
+  USD
+  EUR
+}
+
+enum PriceBasis {
+  VEHICLE_ONLY
+  LANDED
+}
+
+enum FuelType {
+  GASOLINE
+  DIESEL
+  HYBRID
+  PLUGIN_HYBRID
+  ELECTRIC
+  OTHER
+}
+
+enum TransmissionType {
+  AUTOMATIC
+  MANUAL
+  CVT
+  DCT
+  OTHER
+}
+
+enum VehicleBodyType {
+  SUV
+  SEDAN
+  HATCHBACK
+  COUPE
+  PICKUP
+  MINIVAN
+  WAGON
+  CONVERTIBLE
+  OTHER
+}
+
+model Vehicle {
+  id   String @id @default(cuid())
+  slug String @unique
+
+  make     String
+  model    String
+  variant  String?
+  year     Int
+  mileage  Int
+  bodyType VehicleBodyType
+
+  fuelType     FuelType
+  transmission TransmissionType
+
+  engine String?
+  power  Int?
+
+  color         String?
+  interiorColor String?
+  doors         Int?
+  seats         Int?
+
+  originCountry String
+
+  locationStatus VehicleLocationStatus
+  congoCity      CongoCity?
+
+  price           Int
+  currency        Currency
+  priceBasis      PriceBasis
+  priceNegotiable Boolean    @default(false)
+
+  status      VehicleStatus @default(DRAFT)
+  description String?       @db.Text
+  featured    Boolean       @default(false)
+
+  features String[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([locationStatus])
+  @@index([make, model])
+  @@index([year])
+  @@index([price])
+}
