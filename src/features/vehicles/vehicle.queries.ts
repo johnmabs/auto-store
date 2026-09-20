@@ -150,3 +150,42 @@ export async function getVehicleMakes() {
 
   return vehicles.map((vehicle) => vehicle.make);
 }
+
+export async function getAdminVehicles() {
+  return prisma.vehicle.findMany({
+    orderBy: {
+      createdAt: "desc",
+    },
+
+    select: {
+      id: true,
+      slug: true,
+      make: true,
+      model: true,
+      variant: true,
+      year: true,
+
+      locationStatus: true,
+      congoCity: true,
+
+      price: true,
+      currency: true,
+
+      status: true,
+      featured: true,
+
+      createdAt: true,
+
+      images: {
+        where: {
+          isPrimary: true,
+        },
+        take: 1,
+        select: {
+          url: true,
+          alt: true,
+        },
+      },
+    },
+  });
+}
