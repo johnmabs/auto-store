@@ -147,7 +147,7 @@ export default function NewVehiclePage() {
 
             {VEHICLE_ORIGINS.map((origin) => (
               <option key={origin.value} value={origin.value}>
-                {origin.label}
+                {origin.flag} {origin.label}
               </option>
             ))}
           </select>
