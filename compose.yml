@@ -1,0 +1,19 @@
+services:
+  postgres:
+    image: postgres:18-alpine
+    container_name: auto-store-postgres
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: auto_store
+      POSTGRES_USER: auto_store
+      POSTGRES_PASSWORD: auto_store
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql
+
+volumes:
+  postgres_data:
