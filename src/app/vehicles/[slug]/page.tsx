@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 
 import { getVehicleBySlug } from "@/features/vehicles/vehicle.queries";
+import { CustomerRequestForm } from "@/features/requests/customer-request-form";
 
 type VehiclePageProps = {
   params: Promise<{
@@ -198,6 +199,10 @@ export default async function VehiclePage({ params }: VehiclePageProps) {
                 ))}
               </ul>
             </div>
+          )}
+
+          {vehicle.status !== "SOLD" && (
+            <CustomerRequestForm vehicleId={vehicle.id} />
           )}
         </section>
       </div>
