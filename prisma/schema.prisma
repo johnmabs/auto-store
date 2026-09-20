@@ -65,6 +65,12 @@ enum VehicleBodyType {
   OTHER
 }
 
+enum CustomerRequestStatus {
+  NEW
+  CONTACTED
+  CLOSED
+}
+
 model Vehicle {
   id   String @id @default(cuid())
   slug String @unique
@@ -103,7 +109,8 @@ model Vehicle {
 
   features String[]
 
-  images VehicleImage[]
+  images   VehicleImage[]
+  requests CustomerRequest[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -134,4 +141,29 @@ model VehicleImage {
   createdAt DateTime @default(now())
 
   @@index([vehicleId, position])
+}
+
+model CustomerRequest {
+  id String @id @default(cuid())
+
+  firstName String
+  lastName  String?
+  phone     String
+  email     String?
+
+  message String? @db.Text
+
+  vehicleId String?
+  vehicle   Vehicle? @relation(fields: [vehicleId], references: [id], onDelete: SetNull)
+
+  status CustomerRequestStatus @default(NEW)
+
+  adminNotes String? @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+  @@index([vehicleId])
 }
