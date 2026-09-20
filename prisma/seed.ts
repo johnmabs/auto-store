@@ -1,4 +1,5 @@
 import "dotenv/config";
+import argon2 from "argon2";
 
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../src/generated/prisma/client";
@@ -21,6 +22,35 @@ async function main() {
   await prisma.vehicleImage.deleteMany();
   await prisma.customerRequest.deleteMany();
   await prisma.vehicle.deleteMany();
+
+  const adminEmail = process.env.ADMIN_EMAIL;
+  const adminPassword = process.env.ADMIN_PASSWORD;
+  const adminName = process.env.ADMIN_NAME ?? "Administrator";
+
+  if (!adminEmail || !adminPassword) {
+    throw new Error(
+      "ADMIN_EMAIL and ADMIN_PASSWORD must be defined to seed the admin user.",
+    );
+  }
+
+  const passwordHash = await argon2.hash(adminPassword);
+
+  await prisma.user.upsert({
+    where: {
+      email: adminEmail.toLowerCase(),
+    },
+    update: {
+      name: adminName,
+      password: passwordHash,
+      isActive: true,
+    },
+    create: {
+      name: adminName,
+      email: adminEmail.toLowerCase(),
+      password: passwordHash,
+      isActive: true,
+    },
+  });
 
   const vehicles = await Promise.all([
     prisma.vehicle.create({
