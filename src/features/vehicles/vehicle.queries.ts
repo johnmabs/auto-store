@@ -1,9 +1,26 @@
 import { prisma } from "@/lib/prisma";
 
-export async function getVehicles() {
+export type VehicleFilters = {
+  make?: string;
+  location?: "ABROAD" | "IN_TRANSIT" | "IN_CONGO";
+  status?: "AVAILABLE" | "RESERVED" | "SOLD";
+};
+
+export async function getVehicles(filters: VehicleFilters = {}) {
   return prisma.vehicle.findMany({
     where: {
-      status: "AVAILABLE",
+      status: filters.status ?? "AVAILABLE",
+
+      ...(filters.make && {
+        make: {
+          equals: filters.make,
+          mode: "insensitive",
+        },
+      }),
+
+      ...(filters.location && {
+        locationStatus: filters.location,
+      }),
     },
 
     orderBy: {
@@ -33,6 +50,7 @@ export async function getVehicles() {
       priceBasis: true,
       priceNegotiable: true,
 
+      status: true,
       featured: true,
 
       images: {
@@ -109,4 +127,26 @@ export async function getFeaturedVehicles(limit = 6) {
       },
     },
   });
+}
+
+export async function getVehicleMakes() {
+  const vehicles = await prisma.vehicle.findMany({
+    where: {
+      status: {
+        not: "DRAFT",
+      },
+    },
+
+    distinct: ["make"],
+
+    select: {
+      make: true,
+    },
+
+    orderBy: {
+      make: "asc",
+    },
+  });
+
+  return vehicles.map((vehicle) => vehicle.make);
 }
