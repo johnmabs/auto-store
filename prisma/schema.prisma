@@ -167,3 +167,16 @@ model CustomerRequest {
   @@index([createdAt])
   @@index([vehicleId])
 }
+
+model User {
+  id       String  @id @default(cuid())
+  name     String?
+  email    String  @unique
+  password String
+
+  isActive Boolean @default(true)
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  lastLoginAt DateTime?
+}
