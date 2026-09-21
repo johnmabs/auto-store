@@ -10,6 +10,12 @@ import {
   uploadVehicleImage,
 } from "./vehicle-image.service";
 
+export type VehicleFormState = {
+  success: boolean;
+  message?: string;
+  errors?: Record<string, string[]>;
+};
+
 function slugify(value: string) {
   return value
     .toLowerCase()
@@ -26,8 +32,11 @@ function revalidateVehiclePages(vehicleId: string, slug: string) {
   revalidatePath(`/vehicles/${slug}`);
 }
 
-export async function createVehicle(formData: FormData) {
-  const parsed = vehicleFormSchema.parse({
+export async function createVehicle(
+  _previousState: VehicleFormState,
+  formData: FormData,
+): Promise<VehicleFormState> {
+  const parsed = vehicleFormSchema.safeParse({
     make: formData.get("make"),
     model: formData.get("model"),
     variant: formData.get("variant") || undefined,
@@ -44,9 +53,6 @@ export async function createVehicle(formData: FormData) {
 
     color: formData.get("color") || undefined,
     interiorColor: formData.get("interiorColor") || undefined,
-
-    doors: formData.get("doors") || undefined,
-    seats: formData.get("seats") || undefined,
 
     originCountry: formData.get("originCountry"),
 
@@ -66,40 +72,50 @@ export async function createVehicle(formData: FormData) {
     featured: formData.get("featured") === "on",
   });
 
-  const baseSlug = slugify(`${parsed.make}-${parsed.model}-${parsed.year}`);
+  if (!parsed.success) {
+    return {
+      success: false,
+      message: "Veuillez corriger les champs indiqués.",
+      errors: parsed.error.flatten().fieldErrors,
+    };
+  }
+
+  const data = parsed.data;
+
+  const baseSlug = slugify(`${data.make}-${data.model}-${data.year}`);
+
   const slug = `${baseSlug}-${Date.now()}`;
+
   await prisma.vehicle.create({
     data: {
-      ...parsed,
+      ...data,
+      slug,
 
-      variant: parsed.variant || null,
-      engine: parsed.engine || null,
-      power: parsed.power ?? null,
+      variant: data.variant || null,
+      engine: data.engine || null,
+      power: data.power ?? null,
 
-      color: parsed.color || null,
-      interiorColor: parsed.interiorColor || null,
-
-      doors: parsed.doors ?? null,
-      seats: parsed.seats ?? null,
+      color: data.color || null,
+      interiorColor: data.interiorColor || null,
 
       congoCity:
-        parsed.locationStatus === "IN_CONGO"
-          ? (parsed.congoCity ?? null)
-          : null,
+        data.locationStatus === "IN_CONGO" ? (data.congoCity ?? null) : null,
 
-      description: parsed.description || null,
+      description: data.description || null,
 
       features: [],
-
-      slug,
     },
   });
 
   redirect("/admin/vehicles");
 }
 
-export async function updateVehicle(vehicleId: string, formData: FormData) {
-  const parsed = vehicleFormSchema.parse({
+export async function updateVehicle(
+  vehicleId: string,
+  _previousState: VehicleFormState,
+  formData: FormData,
+): Promise<VehicleFormState> {
+  const parsed = vehicleFormSchema.safeParse({
     make: formData.get("make"),
     model: formData.get("model"),
     variant: formData.get("variant") || undefined,
@@ -134,6 +150,16 @@ export async function updateVehicle(vehicleId: string, formData: FormData) {
 
     featured: formData.get("featured") === "on",
   });
+
+  if (!parsed.success) {
+    return {
+      success: false,
+      message: "Veuillez corriger les champs indiqués.",
+      errors: parsed.error.flatten().fieldErrors,
+    };
+  }
+
+  const data = parsed.data;
 
   await prisma.vehicle.update({
     where: {
@@ -141,21 +167,19 @@ export async function updateVehicle(vehicleId: string, formData: FormData) {
     },
 
     data: {
-      ...parsed,
+      ...data,
 
-      variant: parsed.variant || null,
-      engine: parsed.engine || null,
-      power: parsed.power ?? null,
+      variant: data.variant || null,
+      engine: data.engine || null,
+      power: data.power ?? null,
 
-      color: parsed.color || null,
-      interiorColor: parsed.interiorColor || null,
+      color: data.color || null,
+      interiorColor: data.interiorColor || null,
 
       congoCity:
-        parsed.locationStatus === "IN_CONGO"
-          ? (parsed.congoCity ?? null)
-          : null,
+        data.locationStatus === "IN_CONGO" ? (data.congoCity ?? null) : null,
 
-      description: parsed.description || null,
+      description: data.description || null,
     },
   });
 

@@ -1,5 +1,4 @@
-import { createVehicle } from "@/features/vehicles/vehicle.actions";
-import { VehicleForm } from "@/features/vehicles/vehicle-form";
+import { CreateVehicleForm } from "@/features/vehicles/create-vehicle-form";
 
 export default function NewVehiclePage() {
   return (
@@ -12,10 +11,7 @@ export default function NewVehiclePage() {
         </p>
       </div>
 
-      <VehicleForm
-        action={createVehicle}
-        submitLabel="Enregistrer le véhicule"
-      />
+      <CreateVehicleForm />
     </section>
   );
 }

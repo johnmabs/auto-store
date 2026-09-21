@@ -1,13 +1,12 @@
 import { notFound } from "next/navigation";
 
-import { VehicleForm } from "@/features/vehicles/vehicle-form";
 import { getAdminVehicleById } from "@/features/vehicles/vehicle.queries";
+import { EditVehicleForm } from "@/features/vehicles/edit-vehicle-form";
 import {
   addVehicleImage,
   moveVehicleImage,
   removeVehicleImage,
   setPrimaryVehicleImage,
-  updateVehicle,
 } from "@/features/vehicles/vehicle.actions";
 
 type EditVehiclePageProps = {
@@ -27,8 +26,6 @@ export default async function EditVehiclePage({
     notFound();
   }
 
-  const updateVehicleWithId = updateVehicle.bind(null, vehicle.id);
-
   return (
     <section className="max-w-4xl">
       <div>
@@ -39,11 +36,7 @@ export default async function EditVehiclePage({
         </p>
       </div>
 
-      <VehicleForm
-        action={updateVehicleWithId}
-        values={vehicle}
-        submitLabel="Enregistrer les modifications"
-      />
+      <EditVehicleForm vehicleId={vehicle.id} values={vehicle} />
 
       <div className="mt-12">
         <div>
