@@ -120,6 +120,13 @@ export default async function AdminRequestsPage() {
                         </button>
                       </form>
                     )}
+
+                    <Link
+                      href={`/admin/requests/${request.id}`}
+                      className="rounded border px-3 py-1 text-xs"
+                    >
+                      Voir
+                    </Link>
                   </div>
                 </td>
               </tr>

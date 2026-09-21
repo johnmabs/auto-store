@@ -112,3 +112,33 @@ export async function updateCustomerRequestStatus(
 
   revalidatePath("/admin/requests");
 }
+
+export async function updateCustomerRequestNotes(
+  requestId: string,
+  formData: FormData,
+) {
+  const session = await auth();
+
+  if (!session?.user) {
+    throw new Error("Unauthorized");
+  }
+
+  const adminNotes = formData.get("adminNotes");
+
+  await prisma.customerRequest.update({
+    where: {
+      id: requestId,
+    },
+
+    data: {
+      adminNotes:
+        typeof adminNotes === "string" && adminNotes.trim().length > 0
+          ? adminNotes.trim()
+          : null,
+    },
+  });
+
+  revalidatePath(`/admin/requests/${requestId}`);
+
+  revalidatePath("/admin/requests");
+}

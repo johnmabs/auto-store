@@ -19,3 +19,28 @@ export async function getAdminCustomerRequests() {
     },
   });
 }
+
+export async function getAdminCustomerRequestById(id: string) {
+  return prisma.customerRequest.findUnique({
+    where: {
+      id,
+    },
+
+    include: {
+      vehicle: {
+        select: {
+          id: true,
+          slug: true,
+          make: true,
+          model: true,
+          variant: true,
+          year: true,
+          price: true,
+          currency: true,
+          locationStatus: true,
+          congoCity: true,
+        },
+      },
+    },
+  });
+}
