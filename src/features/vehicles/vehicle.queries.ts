@@ -195,5 +195,13 @@ export async function getAdminVehicleById(id: string) {
     where: {
       id,
     },
+
+    include: {
+      images: {
+        orderBy: {
+          position: "asc",
+        },
+      },
+    },
   });
 }
