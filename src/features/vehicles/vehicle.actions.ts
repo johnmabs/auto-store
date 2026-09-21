@@ -338,6 +338,7 @@ export async function removeVehicleImage(vehicleId: string, imageId: string) {
       vehicle: {
         select: {
           slug: true,
+          status: true,
         },
       },
     },
@@ -345,6 +346,26 @@ export async function removeVehicleImage(vehicleId: string, imageId: string) {
 
   if (!image) {
     throw new Error("Image introuvable.");
+  }
+
+  const imageCount = await prisma.vehicleImage.count({
+    where: {
+      vehicleId,
+    },
+  });
+
+  if (image.vehicle.status !== "DRAFT" && imageCount === 1) {
+    throw new Error(
+      "Impossible de supprimer la dernière image d'un véhicule publié.",
+    );
+  }
+
+  const isPublished = image.vehicle.status !== "DRAFT";
+
+  if (isPublished && imageCount === 1) {
+    throw new Error(
+      "Impossible de supprimer la dernière image d'un véhicule publié.",
+    );
   }
 
   await deleteVehicleImage(image.publicId);
