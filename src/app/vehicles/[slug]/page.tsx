@@ -8,6 +8,7 @@ import {
   getTransmissionLabel,
   formatVehiclePrice,
   getVehicleLocationLabel,
+  getVehicleFeatureLabel,
 } from "@/features/vehicles/vehicle.formatters";
 
 type VehiclePageProps = {
@@ -198,7 +199,7 @@ export default async function VehiclePage({ params }: VehiclePageProps) {
                     key={feature}
                     className="rounded-lg bg-neutral-50 px-3 py-2 text-sm"
                   >
-                    {feature}
+                    {getVehicleFeatureLabel(feature)}
                   </li>
                 ))}
               </ul>

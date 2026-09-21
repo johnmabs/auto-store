@@ -54,6 +54,7 @@ export const vehicleFormSchema = z
     status: z.enum(["DRAFT", "AVAILABLE", "RESERVED", "SOLD"]),
     description: z.string().trim().optional(),
     featured: z.coerce.boolean().default(false),
+    features: z.array(z.string()).default([]),
   })
   .refine(
     (data) => data.locationStatus !== "IN_CONGO" || Boolean(data.congoCity),

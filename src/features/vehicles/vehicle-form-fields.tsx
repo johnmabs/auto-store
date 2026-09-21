@@ -2,6 +2,7 @@
 
 import type { VehicleFormState } from "./vehicle.actions";
 import { VEHICLE_ORIGINS } from "./vehicle.constants";
+import { VEHICLE_FEATURES } from "./vehicle-features";
 
 export type VehicleFormValues = {
   make?: string;
@@ -34,6 +35,7 @@ export type VehicleFormValues = {
   status?: string;
 
   description?: string | null;
+  features?: string[];
   featured?: boolean;
 };
 
@@ -232,6 +234,32 @@ export function VehicleFormFields({
             className="rounded-lg border px-3 py-2"
           />
         </div>
+      </fieldset>
+
+      <fieldset className="space-y-4 rounded-xl border bg-white p-6">
+        <legend className="px-2 font-semibold">Équipements et options</legend>
+
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {VEHICLE_FEATURES.map((feature) => (
+            <label
+              key={feature.value}
+              className="flex items-center gap-2 rounded-lg border p-3 text-sm"
+            >
+              <input
+                type="checkbox"
+                name="features"
+                value={feature.value}
+                defaultChecked={
+                  values.features?.includes(feature.value) ?? false
+                }
+              />
+
+              {feature.label}
+            </label>
+          ))}
+        </div>
+
+        <FieldError errors={state.errors?.features} />
       </fieldset>
 
       <fieldset className="space-y-4 rounded-xl border bg-white p-6">

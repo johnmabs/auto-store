@@ -1,4 +1,11 @@
 import { VEHICLE_ORIGINS } from "./vehicle.constants";
+import { VEHICLE_FEATURES } from "./vehicle-features";
+
+export function getVehicleFeatureLabel(value: string) {
+  return (
+    VEHICLE_FEATURES.find((feature) => feature.value === value)?.label ?? value
+  );
+}
 
 export function formatVehiclePrice(
   price: number,

@@ -74,6 +74,10 @@ export async function createVehicle(
 
     description: formData.get("description") || undefined,
 
+    features: formData
+      .getAll("features")
+      .filter((value): value is string => typeof value === "string"),
+
     featured: formData.get("featured") === "on",
   });
 
@@ -115,8 +119,6 @@ export async function createVehicle(
         data.locationStatus === "IN_CONGO" ? (data.congoCity ?? null) : null,
 
       description: data.description || null,
-
-      features: [],
     },
   });
 
@@ -327,6 +329,7 @@ export async function addVehicleImages(vehicleId: string, formData: FormData) {
 
   revalidateVehiclePages(vehicle.id, vehicle.slug);
 }
+
 export async function removeVehicleImage(vehicleId: string, imageId: string) {
   const image = await prisma.vehicleImage.findFirst({
     where: {
@@ -355,14 +358,6 @@ export async function removeVehicleImage(vehicleId: string, imageId: string) {
   });
 
   if (image.vehicle.status !== "DRAFT" && imageCount === 1) {
-    throw new Error(
-      "Impossible de supprimer la dernière image d'un véhicule publié.",
-    );
-  }
-
-  const isPublished = image.vehicle.status !== "DRAFT";
-
-  if (isPublished && imageCount === 1) {
     throw new Error(
       "Impossible de supprimer la dernière image d'un véhicule publié.",
     );
