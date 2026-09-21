@@ -5,7 +5,10 @@ import { revalidatePath } from "next/cache";
 
 import { prisma } from "@/lib/prisma";
 import { vehicleFormSchema } from "./vehicle-form.schema";
-import { uploadVehicleImage } from "./vehicle-image.service";
+import {
+  deleteVehicleImage,
+  uploadVehicleImage,
+} from "./vehicle-image.service";
 
 function slugify(value: string) {
   return value
@@ -14,6 +17,13 @@ function slugify(value: string) {
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)/g, "");
+}
+
+function revalidateVehiclePages(vehicleId: string, slug: string) {
+  revalidatePath("/admin/vehicles");
+  revalidatePath(`/admin/vehicles/${vehicleId}/edit`);
+  revalidatePath("/vehicles");
+  revalidatePath(`/vehicles/${slug}`);
 }
 
 export async function createVehicle(formData: FormData) {
@@ -57,9 +67,7 @@ export async function createVehicle(formData: FormData) {
   });
 
   const baseSlug = slugify(`${parsed.make}-${parsed.model}-${parsed.year}`);
-
   const slug = `${baseSlug}-${Date.now()}`;
-
   await prisma.vehicle.create({
     data: {
       ...parsed,
@@ -203,4 +211,190 @@ export async function addVehicleImage(vehicleId: string, formData: FormData) {
 
   revalidatePath("/admin/vehicles");
   revalidatePath("/vehicles");
+}
+
+export async function removeVehicleImage(vehicleId: string, imageId: string) {
+  const image = await prisma.vehicleImage.findFirst({
+    where: {
+      id: imageId,
+      vehicleId,
+    },
+
+    include: {
+      vehicle: {
+        select: {
+          slug: true,
+        },
+      },
+    },
+  });
+
+  if (!image) {
+    throw new Error("Image introuvable.");
+  }
+
+  await deleteVehicleImage(image.publicId);
+
+  await prisma.$transaction(async (tx) => {
+    await tx.vehicleImage.delete({
+      where: {
+        id: image.id,
+      },
+    });
+
+    const remainingImages = await tx.vehicleImage.findMany({
+      where: {
+        vehicleId,
+      },
+
+      orderBy: {
+        position: "asc",
+      },
+
+      select: {
+        id: true,
+        isPrimary: true,
+      },
+    });
+
+    for (let position = 0; position < remainingImages.length; position++) {
+      await tx.vehicleImage.update({
+        where: {
+          id: remainingImages[position].id,
+        },
+
+        data: {
+          position,
+        },
+      });
+    }
+
+    if (image.isPrimary && remainingImages.length > 0) {
+      await tx.vehicleImage.update({
+        where: {
+          id: remainingImages[0].id,
+        },
+
+        data: {
+          isPrimary: true,
+        },
+      });
+    }
+  });
+
+  revalidateVehiclePages(vehicleId, image.vehicle.slug);
+}
+
+export async function setPrimaryVehicleImage(
+  vehicleId: string,
+  imageId: string,
+) {
+  const image = await prisma.vehicleImage.findFirst({
+    where: {
+      id: imageId,
+      vehicleId,
+    },
+
+    include: {
+      vehicle: {
+        select: {
+          slug: true,
+        },
+      },
+    },
+  });
+
+  if (!image) {
+    throw new Error("Image introuvable.");
+  }
+
+  if (!image.isPrimary) {
+    await prisma.$transaction([
+      prisma.vehicleImage.updateMany({
+        where: {
+          vehicleId,
+          isPrimary: true,
+        },
+
+        data: {
+          isPrimary: false,
+        },
+      }),
+
+      prisma.vehicleImage.update({
+        where: {
+          id: imageId,
+        },
+
+        data: {
+          isPrimary: true,
+        },
+      }),
+    ]);
+  }
+
+  revalidateVehiclePages(vehicleId, image.vehicle.slug);
+}
+
+export async function moveVehicleImage(
+  vehicleId: string,
+  imageId: string,
+  direction: "up" | "down",
+) {
+  const images = await prisma.vehicleImage.findMany({
+    where: {
+      vehicleId,
+    },
+
+    orderBy: {
+      position: "asc",
+    },
+
+    include: {
+      vehicle: {
+        select: {
+          slug: true,
+        },
+      },
+    },
+  });
+
+  const currentIndex = images.findIndex((image) => image.id === imageId);
+
+  if (currentIndex === -1) {
+    throw new Error("Image introuvable.");
+  }
+
+  const targetIndex = direction === "up" ? currentIndex - 1 : currentIndex + 1;
+
+  if (targetIndex < 0 || targetIndex >= images.length) {
+    return;
+  }
+
+  const currentImage = images[currentIndex];
+  const targetImage = images[targetIndex];
+
+  await prisma.$transaction([
+    prisma.vehicleImage.update({
+      where: {
+        id: currentImage.id,
+      },
+
+      data: {
+        position: targetImage.position,
+      },
+    }),
+
+    prisma.vehicleImage.update({
+      where: {
+        id: targetImage.id,
+      },
+
+      data: {
+        position: currentImage.position,
+      },
+    }),
+  ]);
+
+  revalidateVehiclePages(vehicleId, currentImage.vehicle.slug);
 }

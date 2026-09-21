@@ -40,3 +40,14 @@ export async function uploadVehicleImage(
     stream.end(buffer);
   });
 }
+
+export async function deleteVehicleImage(publicId: string) {
+  const result = await cloudinary.uploader.destroy(publicId, {
+    resource_type: "image",
+    invalidate: true,
+  });
+
+  if (result.result !== "ok" && result.result !== "not found") {
+    throw new Error("Impossible de supprimer l'image de Cloudinary.");
+  }
+}
