@@ -93,11 +93,11 @@ export async function getFeaturedVehicles(limit = 6) {
       featured: true,
     },
 
-    take: limit,
-
     orderBy: {
       createdAt: "desc",
     },
+
+    take: limit,
 
     select: {
       id: true,
@@ -106,6 +106,10 @@ export async function getFeaturedVehicles(limit = 6) {
       model: true,
       variant: true,
       year: true,
+      mileage: true,
+      bodyType: true,
+      fuelType: true,
+      transmission: true,
 
       originCountry: true,
       locationStatus: true,
@@ -114,12 +118,16 @@ export async function getFeaturedVehicles(limit = 6) {
       price: true,
       currency: true,
       priceBasis: true,
+      priceNegotiable: true,
+
+      featured: true,
 
       images: {
         where: {
           isPrimary: true,
         },
         take: 1,
+
         select: {
           url: true,
           alt: true,
