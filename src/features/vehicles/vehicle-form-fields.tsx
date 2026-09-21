@@ -44,6 +44,7 @@ type VehicleFormFieldsProps = {
 
   values?: VehicleFormValues;
   submitLabel: string;
+  showStatus?: boolean;
 };
 
 function FieldError({ errors }: { errors?: string[] }) {
@@ -60,6 +61,7 @@ export function VehicleFormFields({
   pending,
   values = {},
   submitLabel,
+  showStatus = true,
 }: VehicleFormFieldsProps) {
   return (
     <form action={action} className="mt-8 space-y-8" noValidate>
@@ -346,20 +348,24 @@ export function VehicleFormFields({
           </div>
         </div>
 
-        <div>
-          <select
-            name="status"
-            defaultValue={values.status ?? "DRAFT"}
-            className="rounded-lg border px-3 py-2"
-          >
-            <option value="DRAFT">Brouillon</option>
-            <option value="AVAILABLE">Disponible</option>
-            <option value="RESERVED">Réservé</option>
-            <option value="SOLD">Vendu</option>
-          </select>
+        {showStatus ? (
+          <div>
+            <select
+              name="status"
+              defaultValue={values.status ?? "DRAFT"}
+              className="rounded-lg border px-3 py-2"
+            >
+              <option value="DRAFT">Brouillon</option>
+              <option value="AVAILABLE">Disponible</option>
+              <option value="RESERVED">Réservé</option>
+              <option value="SOLD">Vendu</option>
+            </select>
 
-          <FieldError errors={state.errors?.status} />
-        </div>
+            <FieldError errors={state.errors?.status} />
+          </div>
+        ) : (
+          <input type="hidden" name="status" value="DRAFT" />
+        )}
 
         <textarea
           name="description"

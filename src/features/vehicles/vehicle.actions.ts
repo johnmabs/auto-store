@@ -10,6 +10,11 @@ import {
   uploadVehicleImage,
 } from "./vehicle-image.service";
 
+import {
+  canTransitionVehicleStatus,
+  requiresPublishedVehicle,
+} from "./vehicle-status";
+
 export type VehicleFormState = {
   success: boolean;
   message?: string;
@@ -81,6 +86,14 @@ export async function createVehicle(
   }
 
   const data = parsed.data;
+
+  if (data.status !== "DRAFT") {
+    return {
+      success: false,
+      message:
+        "Un nouveau véhicule doit d'abord être enregistré comme brouillon.",
+    };
+  }
 
   const baseSlug = slugify(`${data.make}-${data.model}-${data.year}`);
 
@@ -160,6 +173,52 @@ export async function updateVehicle(
   }
 
   const data = parsed.data;
+
+  const currentVehicle = await prisma.vehicle.findUnique({
+    where: {
+      id: vehicleId,
+    },
+
+    select: {
+      status: true,
+
+      images: {
+        where: {
+          isPrimary: true,
+        },
+
+        take: 1,
+
+        select: {
+          id: true,
+        },
+      },
+    },
+  });
+
+  if (!currentVehicle) {
+    return {
+      success: false,
+      message: "Véhicule introuvable.",
+    };
+  }
+
+  if (!canTransitionVehicleStatus(currentVehicle.status, data.status)) {
+    return {
+      success: false,
+      message: `Transition de statut interdite : ${currentVehicle.status} → ${data.status}.`,
+    };
+  }
+
+  if (
+    requiresPublishedVehicle(data.status) &&
+    currentVehicle.images.length === 0
+  ) {
+    return {
+      success: false,
+      message: "Ajoutez une image principale avant de publier ce véhicule.",
+    };
+  }
 
   await prisma.vehicle.update({
     where: {

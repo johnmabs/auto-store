@@ -21,6 +21,7 @@ export function CreateVehicleForm() {
       state={state}
       pending={pending}
       submitLabel="Enregistrer le véhicule"
+      showStatus={false}
     />
   );
 }
