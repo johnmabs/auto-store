@@ -177,6 +177,22 @@ export default async function VehiclePage({ params }: VehiclePageProps) {
                 <dd className="font-medium">{vehicle.color}</dd>
               </div>
             )}
+
+            {vehicle.doors && (
+              <div>
+                <dt className="text-sm text-neutral-500">Portes</dt>
+
+                <dd className="font-medium">{vehicle.doors} portes</dd>
+              </div>
+            )}
+
+            {vehicle.seats && (
+              <div>
+                <dt className="text-sm text-neutral-500">Places</dt>
+
+                <dd className="font-medium">{vehicle.seats} places</dd>
+              </div>
+            )}
           </dl>
 
           {vehicle.description && (

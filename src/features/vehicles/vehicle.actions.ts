@@ -78,6 +78,9 @@ export async function createVehicle(
       .getAll("features")
       .filter((value): value is string => typeof value === "string"),
 
+    doors: formData.get("doors") || undefined,
+    seats: formData.get("seats") || undefined,
+
     featured: formData.get("featured") === "on",
   });
 
@@ -114,6 +117,9 @@ export async function createVehicle(
 
       color: data.color || null,
       interiorColor: data.interiorColor || null,
+
+      doors: data.doors ?? null,
+      seats: data.seats ?? null,
 
       congoCity:
         data.locationStatus === "IN_CONGO" ? (data.congoCity ?? null) : null,
@@ -162,6 +168,13 @@ export async function updateVehicle(
     status: formData.get("status"),
 
     description: formData.get("description") || undefined,
+
+    features: formData
+      .getAll("features")
+      .filter((value): value is string => typeof value === "string"),
+
+    doors: formData.get("doors") || undefined,
+    seats: formData.get("seats") || undefined,
 
     featured: formData.get("featured") === "on",
   });
@@ -236,6 +249,9 @@ export async function updateVehicle(
 
       color: data.color || null,
       interiorColor: data.interiorColor || null,
+
+      doors: data.doors ?? null,
+      seats: data.seats ?? null,
 
       congoCity:
         data.locationStatus === "IN_CONGO" ? (data.congoCity ?? null) : null,

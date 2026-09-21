@@ -36,6 +36,8 @@ export type VehicleFormValues = {
 
   description?: string | null;
   features?: string[];
+  doors?: number | null;
+  seats?: number | null;
   featured?: boolean;
 };
 
@@ -218,6 +220,34 @@ export function VehicleFormFields({
             />
 
             <FieldError errors={state.errors?.power} />
+          </div>
+
+          <div>
+            <input
+              name="doors"
+              type="number"
+              min={1}
+              max={10}
+              placeholder="Nombre de portes"
+              defaultValue={values.doors ?? ""}
+              className="w-full rounded-lg border px-3 py-2"
+            />
+
+            <FieldError errors={state.errors?.doors} />
+          </div>
+
+          <div>
+            <input
+              name="seats"
+              type="number"
+              min={1}
+              max={20}
+              placeholder="Nombre de places"
+              defaultValue={values.seats ?? ""}
+              className="w-full rounded-lg border px-3 py-2"
+            />
+
+            <FieldError errors={state.errors?.seats} />
           </div>
 
           <input
