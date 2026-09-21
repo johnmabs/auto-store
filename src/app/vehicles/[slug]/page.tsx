@@ -2,20 +2,19 @@ import { notFound } from "next/navigation";
 
 import { getVehicleBySlug } from "@/features/vehicles/vehicle.queries";
 import { CustomerRequestForm } from "@/features/requests/customer-request-form";
+import {
+  getVehicleOriginLabel,
+  getFuelTypeLabel,
+  getTransmissionLabel,
+  formatVehiclePrice,
+  getVehicleLocationLabel,
+} from "@/features/vehicles/vehicle.formatters";
 
 type VehiclePageProps = {
   params: Promise<{
     slug: string;
   }>;
 };
-
-function formatPrice(price: number, currency: "XAF" | "USD" | "EUR") {
-  return new Intl.NumberFormat("fr-FR", {
-    style: "currency",
-    currency,
-    maximumFractionDigits: 0,
-  }).format(price);
-}
 
 function getLocationLabel(
   locationStatus: "ABROAD" | "IN_TRANSIT" | "IN_CONGO",
@@ -55,7 +54,7 @@ export default async function VehiclePage({ params }: VehiclePageProps) {
     <main className="mx-auto max-w-7xl px-6 py-12">
       <div className="grid gap-10 lg:grid-cols-[1.4fr_1fr]">
         <section>
-          <div className="aspect-[4/3] overflow-hidden rounded-xl bg-neutral-100">
+          <div className="aspect-4/3 overflow-hidden rounded-xl bg-neutral-100">
             {mainImage ? (
               <img
                 src={mainImage.url}
@@ -74,7 +73,7 @@ export default async function VehiclePage({ params }: VehiclePageProps) {
               {vehicle.images.map((image) => (
                 <div
                   key={image.id}
-                  className="aspect-[4/3] overflow-hidden rounded-lg bg-neutral-100"
+                  className="aspect-4/3 overflow-hidden rounded-lg bg-neutral-100"
                 >
                   <img
                     src={image.url}
@@ -102,14 +101,13 @@ export default async function VehiclePage({ params }: VehiclePageProps) {
 
           <div>
             <p className="text-3xl font-semibold">
-              {formatPrice(vehicle.price, vehicle.currency)}
+              {formatVehiclePrice(vehicle.price, vehicle.currency)}
             </p>
 
             <p className="mt-2 text-neutral-700">
-              {getLocationLabel(
+              {getVehicleLocationLabel(
                 vehicle.locationStatus,
                 vehicle.congoCity,
-                vehicle.originCountry,
               )}
             </p>
 
@@ -127,7 +125,9 @@ export default async function VehiclePage({ params }: VehiclePageProps) {
           <dl className="grid grid-cols-2 gap-x-6 gap-y-4 text-sm">
             <div>
               <dt className="text-neutral-500">Provenance</dt>
-              <dd className="font-medium">{vehicle.originCountry}</dd>
+              <dd className="font-medium">
+                {getVehicleOriginLabel(vehicle.originCountry)}
+              </dd>
             </div>
 
             <div>
@@ -139,12 +139,16 @@ export default async function VehiclePage({ params }: VehiclePageProps) {
 
             <div>
               <dt className="text-neutral-500">Carburant</dt>
-              <dd className="font-medium">{vehicle.fuelType}</dd>
+              <dd className="font-medium">
+                {getFuelTypeLabel(vehicle.fuelType)}
+              </dd>
             </div>
 
             <div>
               <dt className="text-neutral-500">Transmission</dt>
-              <dd className="font-medium">{vehicle.transmission}</dd>
+              <dd className="font-medium">
+                {getTransmissionLabel(vehicle.transmission)}
+              </dd>
             </div>
 
             <div>

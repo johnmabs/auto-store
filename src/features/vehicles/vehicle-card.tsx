@@ -1,5 +1,10 @@
 import Link from "next/link";
 
+import {
+  formatVehiclePrice,
+  getVehicleLocationLabel,
+} from "@/features/vehicles/vehicle.formatters";
+
 type VehicleCardProps = {
   vehicle: {
     slug: string;
@@ -20,35 +25,6 @@ type VehicleCardProps = {
     }[];
   };
 };
-
-function formatPrice(
-  price: number,
-  currency: VehicleCardProps["vehicle"]["currency"],
-) {
-  return new Intl.NumberFormat("fr-FR", {
-    style: "currency",
-    currency,
-    maximumFractionDigits: 0,
-  }).format(price);
-}
-
-function getLocationLabel(vehicle: VehicleCardProps["vehicle"]) {
-  if (vehicle.locationStatus === "IN_CONGO") {
-    if (vehicle.congoCity === "POINTE_NOIRE") {
-      return "Disponible à Pointe-Noire";
-    }
-
-    if (vehicle.congoCity === "BRAZZAVILLE") {
-      return "Disponible à Brazzaville";
-    }
-  }
-
-  if (vehicle.locationStatus === "IN_TRANSIT") {
-    return "En transit vers le Congo";
-  }
-
-  return `Disponible à l'importation depuis ${vehicle.originCountry}`;
-}
 
 export function VehicleCard({ vehicle }: VehicleCardProps) {
   const primaryImage = vehicle.images[0];
@@ -86,11 +62,11 @@ export function VehicleCard({ vehicle }: VehicleCardProps) {
 
         <div className="space-y-1">
           <p className="font-medium">
-            {formatPrice(vehicle.price, vehicle.currency)}
+            {formatVehiclePrice(vehicle.price, vehicle.currency)}
           </p>
 
           <p className="text-sm text-neutral-600">
-            {getLocationLabel(vehicle)}
+            {getVehicleLocationLabel(vehicle.locationStatus, vehicle.congoCity)}
           </p>
 
           <p className="text-xs text-neutral-500">

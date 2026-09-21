@@ -6,48 +6,14 @@ import {
   updateCustomerRequestStatus,
 } from "@/features/requests/request.actions";
 import { getAdminCustomerRequestById } from "@/features/requests/request.queries";
+import { getCustomerRequestStatusLabel } from "@/features/requests/request.formatters";
+import { getVehicleLocationLabel } from "@/features/vehicles/vehicle.formatters";
 
 type AdminRequestPageProps = {
   params: Promise<{
     id: string;
   }>;
 };
-
-function getStatusLabel(status: "NEW" | "CONTACTED" | "CLOSED") {
-  switch (status) {
-    case "NEW":
-      return "Nouvelle";
-
-    case "CONTACTED":
-      return "Contactée";
-
-    case "CLOSED":
-      return "Clôturée";
-  }
-}
-
-function getLocationLabel(
-  locationStatus: "ABROAD" | "IN_TRANSIT" | "IN_CONGO",
-  congoCity: "POINTE_NOIRE" | "BRAZZAVILLE" | null,
-) {
-  if (locationStatus === "IN_TRANSIT") {
-    return "En transit";
-  }
-
-  if (locationStatus === "ABROAD") {
-    return "À l'étranger";
-  }
-
-  if (congoCity === "POINTE_NOIRE") {
-    return "Pointe-Noire";
-  }
-
-  if (congoCity === "BRAZZAVILLE") {
-    return "Brazzaville";
-  }
-
-  return "Congo";
-}
 
 export default async function AdminRequestPage({
   params,
@@ -85,7 +51,7 @@ export default async function AdminRequestPage({
         </div>
 
         <div className="rounded-full border px-3 py-1 text-sm">
-          {getStatusLabel(request.status)}
+          {getCustomerRequestStatusLabel(request.status)}
         </div>
       </div>
 
@@ -158,7 +124,7 @@ export default async function AdminRequestPage({
                     <dt className="text-neutral-500">Localisation</dt>
 
                     <dd>
-                      {getLocationLabel(
+                      {getVehicleLocationLabel(
                         request.vehicle.locationStatus,
                         request.vehicle.congoCity,
                       )}

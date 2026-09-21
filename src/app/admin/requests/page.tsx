@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { updateCustomerRequestStatus } from "@/features/requests/request.actions";
 import { getAdminCustomerRequests } from "@/features/requests/request.queries";
+import { getCustomerRequestStatusLabel } from "@/features/requests/request.formatters";
 
 function getStatusLabel(status: "NEW" | "CONTACTED" | "CLOSED") {
   switch (status) {
@@ -76,7 +77,9 @@ export default async function AdminRequestsPage() {
                   )}
                 </td>
 
-                <td className="px-4 py-3">{getStatusLabel(request.status)}</td>
+                <td className="px-4 py-3">
+                  {getCustomerRequestStatusLabel(request.status)}
+                </td>
 
                 <td className="px-4 py-3">
                   {new Intl.DateTimeFormat("fr-FR", {
