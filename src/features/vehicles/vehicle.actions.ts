@@ -87,3 +87,67 @@ export async function createVehicle(formData: FormData) {
 
   redirect("/admin/vehicles");
 }
+
+export async function updateVehicle(vehicleId: string, formData: FormData) {
+  const parsed = vehicleFormSchema.parse({
+    make: formData.get("make"),
+    model: formData.get("model"),
+    variant: formData.get("variant") || undefined,
+
+    year: formData.get("year"),
+    mileage: formData.get("mileage"),
+
+    bodyType: formData.get("bodyType"),
+    fuelType: formData.get("fuelType"),
+    transmission: formData.get("transmission"),
+
+    engine: formData.get("engine") || undefined,
+    power: formData.get("power") || undefined,
+
+    color: formData.get("color") || undefined,
+    interiorColor: formData.get("interiorColor") || undefined,
+
+    originCountry: formData.get("originCountry"),
+
+    locationStatus: formData.get("locationStatus"),
+    congoCity: formData.get("congoCity") || undefined,
+
+    price: formData.get("price"),
+    currency: formData.get("currency"),
+    priceBasis: formData.get("priceBasis"),
+
+    priceNegotiable: formData.get("priceNegotiable") === "on",
+
+    status: formData.get("status"),
+
+    description: formData.get("description") || undefined,
+
+    featured: formData.get("featured") === "on",
+  });
+
+  await prisma.vehicle.update({
+    where: {
+      id: vehicleId,
+    },
+
+    data: {
+      ...parsed,
+
+      variant: parsed.variant || null,
+      engine: parsed.engine || null,
+      power: parsed.power ?? null,
+
+      color: parsed.color || null,
+      interiorColor: parsed.interiorColor || null,
+
+      congoCity:
+        parsed.locationStatus === "IN_CONGO"
+          ? (parsed.congoCity ?? null)
+          : null,
+
+      description: parsed.description || null,
+    },
+  });
+
+  redirect("/admin/vehicles");
+}

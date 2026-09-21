@@ -189,3 +189,11 @@ export async function getAdminVehicles() {
     },
   });
 }
+
+export async function getAdminVehicleById(id: string) {
+  return prisma.vehicle.findUnique({
+    where: {
+      id,
+    },
+  });
+}
