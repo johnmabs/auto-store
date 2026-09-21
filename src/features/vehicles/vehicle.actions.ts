@@ -245,19 +245,28 @@ export async function updateVehicle(
   redirect("/admin/vehicles");
 }
 
-export async function addVehicleImage(vehicleId: string, formData: FormData) {
-  const file = formData.get("image");
+export async function addVehicleImages(vehicleId: string, formData: FormData) {
+  const files = formData
+    .getAll("images")
+    .filter((value): value is File => value instanceof File && value.size > 0);
 
-  if (!(file instanceof File) || file.size === 0) {
+  if (files.length === 0) {
     throw new Error("Aucune image sélectionnée.");
+  }
+
+  if (files.length > 10) {
+    throw new Error("Vous pouvez envoyer au maximum 10 images à la fois.");
   }
 
   const vehicle = await prisma.vehicle.findUnique({
     where: {
       id: vehicleId,
     },
+
     select: {
       id: true,
+      slug: true,
+
       _count: {
         select: {
           images: true,
@@ -270,32 +279,54 @@ export async function addVehicleImage(vehicleId: string, formData: FormData) {
     throw new Error("Véhicule introuvable.");
   }
 
-  const upload = await uploadVehicleImage(file, vehicle.id);
+  const startPosition = vehicle._count.images;
 
-  await prisma.vehicleImage.create({
-    data: {
-      vehicleId: vehicle.id,
+  const uploadedImages: {
+    publicId: string;
+    url: string;
+    width?: number;
+    height?: number;
+  }[] = [];
 
-      url: upload.secure_url,
-      publicId: upload.public_id,
+  try {
+    for (const file of files) {
+      const upload = await uploadVehicleImage(file, vehicle.id);
 
-      width: upload.width,
-      height: upload.height,
+      uploadedImages.push({
+        publicId: upload.public_id,
+        url: upload.secure_url,
+        width: upload.width,
+        height: upload.height,
+      });
+    }
 
-      position: vehicle._count.images,
+    await prisma.vehicleImage.createMany({
+      data: uploadedImages.map((image, index) => ({
+        vehicleId: vehicle.id,
 
-      isPrimary: vehicle._count.images === 0,
+        url: image.url,
+        publicId: image.publicId,
 
-      alt: null,
-    },
-  });
+        width: image.width,
+        height: image.height,
 
-  revalidatePath(`/admin/vehicles/${vehicle.id}/edit`);
+        position: startPosition + index,
 
-  revalidatePath("/admin/vehicles");
-  revalidatePath("/vehicles");
+        isPrimary: startPosition === 0 && index === 0,
+
+        alt: null,
+      })),
+    });
+  } catch (error) {
+    await Promise.allSettled(
+      uploadedImages.map((image) => deleteVehicleImage(image.publicId)),
+    );
+
+    throw error;
+  }
+
+  revalidateVehiclePages(vehicle.id, vehicle.slug);
 }
-
 export async function removeVehicleImage(vehicleId: string, imageId: string) {
   const image = await prisma.vehicleImage.findFirst({
     where: {

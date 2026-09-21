@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { getAdminVehicleById } from "@/features/vehicles/vehicle.queries";
 import { EditVehicleForm } from "@/features/vehicles/edit-vehicle-form";
 import {
-  addVehicleImage,
+  addVehicleImages,
   moveVehicleImage,
   removeVehicleImage,
   setPrimaryVehicleImage,
@@ -143,18 +143,19 @@ export default async function EditVehiclePage({
         )}
 
         <form
-          action={addVehicleImage.bind(null, vehicle.id)}
+          action={addVehicleImages.bind(null, vehicle.id)}
           className="mt-6 rounded-xl border bg-white p-6"
         >
-          <label htmlFor="image" className="block text-sm font-medium">
-            Ajouter une image
+          <label htmlFor="images" className="block text-sm font-medium">
+            Ajouter des images
           </label>
 
           <input
-            id="image"
-            name="image"
+            id="images"
+            name="images"
             type="file"
             accept="image/jpeg,image/png,image/webp"
+            multiple
             required
             className="mt-2 block w-full text-sm"
           />
@@ -167,7 +168,7 @@ export default async function EditVehiclePage({
             type="submit"
             className="mt-4 rounded-lg bg-black px-4 py-2 text-sm text-white"
           >
-            Envoyer l&apos;image
+            Envoyer les images
           </button>
         </form>
       </div>
