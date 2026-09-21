@@ -1,5 +1,7 @@
 "use server";
 
+import { auth } from "@/auth";
+import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { customerRequestSchema } from "./request.schema";
 
@@ -86,4 +88,27 @@ export async function createCustomerRequest(
       message: "Une erreur est survenue lors de l'envoi de votre demande.",
     };
   }
+}
+
+export async function updateCustomerRequestStatus(
+  requestId: string,
+  status: "NEW" | "CONTACTED" | "CLOSED",
+) {
+  const session = await auth();
+
+  if (!session?.user) {
+    throw new Error("Unauthorized");
+  }
+
+  await prisma.customerRequest.update({
+    where: {
+      id: requestId,
+    },
+
+    data: {
+      status,
+    },
+  });
+
+  revalidatePath("/admin/requests");
 }
