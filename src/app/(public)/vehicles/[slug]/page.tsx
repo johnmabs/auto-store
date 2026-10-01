@@ -1,5 +1,4 @@
 import { notFound } from "next/navigation";
-import Image from "next/image";
 
 import { getVehicleBySlug } from "@/features/vehicles/vehicle.queries";
 import { CustomerRequestForm } from "@/features/requests/customer-request-form";
@@ -11,6 +10,8 @@ import {
   getVehicleLocationLabel,
   getVehicleFeatureLabel,
 } from "@/features/vehicles/vehicle.formatters";
+
+import { VehicleGallery } from "@/features/vehicles/vehicle-gallery";
 
 type VehiclePageProps = {
   params: Promise<{
@@ -27,48 +28,14 @@ export default async function VehiclePage({ params }: VehiclePageProps) {
     notFound();
   }
 
-  const mainImage =
-    vehicle.images.find((image) => image.isPrimary) ?? vehicle.images[0];
-
   return (
     <main className="mx-auto max-w-7xl px-6 py-12">
       <div className="grid gap-10 lg:grid-cols-[1.4fr_1fr]">
         <section>
-          <div className="relative aspect-16/10 overflow-hidden rounded-xl bg-neutral-100">
-            {mainImage ? (
-              <Image
-                src={mainImage.url}
-                alt={mainImage.alt ?? `${vehicle.make} ${vehicle.model}`}
-                fill
-                priority
-                sizes="(max-width: 1024px) 100vw, 65vw"
-                className="object-cover"
-              />
-            ) : (
-              <div className="flex h-full items-center justify-center text-neutral-500">
-                Aucune photo
-              </div>
-            )}
-          </div>
-
-          {vehicle.images.length > 1 && (
-            <div className="mt-4 grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5">
-              {vehicle.images.map((image) => (
-                <div
-                  key={image.id}
-                  className="relative aspect-4/3 overflow-hidden rounded-lg bg-neutral-100"
-                >
-                  <Image
-                    src={image.url}
-                    alt={image.alt ?? `${vehicle.make} ${vehicle.model}`}
-                    fill
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    className="object-cover"
-                  />
-                </div>
-              ))}
-            </div>
-          )}
+          <VehicleGallery
+            images={vehicle.images}
+            vehicleLabel={`${vehicle.make} ${vehicle.model}`}
+          />
         </section>
 
         <section className="space-y-8">

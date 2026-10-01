@@ -51,7 +51,7 @@ export default async function AdminVehiclesPage() {
                 <tr key={vehicle.id} className="border-b last:border-b-0">
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
-                      <div className="h-14 w-20 overflow-hidden rounded-md bg-neutral-100">
+                      <div className="relative h-14 w-20 overflow-hidden rounded-md bg-neutral-100">
                         {image ? (
                           <Image
                             src={image.url}
