@@ -9,6 +9,7 @@ import { VehicleCard } from "@/features/vehicles/vehicle-card";
 
 type VehiclesPageProps = {
   searchParams: Promise<{
+    q?: string;
     make?: string;
     location?: string;
     status?: string;
@@ -164,6 +165,7 @@ export default async function VehiclesPage({
     maxPrice: parseNumber(params.maxPrice),
     sort: parseSort(params.sort),
     page: parsePage(params.page),
+    search: params.q?.trim() || undefined,
   };
 
   const [vehicleResult, makes] = await Promise.all([
@@ -189,6 +191,20 @@ export default async function VehiclesPage({
         method="get"
         className="mb-10 grid gap-4 rounded-xl border p-5 md:grid-cols-2 lg:grid-cols-4"
       >
+        <div className="md:col-span-2 lg:col-span-2">
+          <label htmlFor="q" className="mb-1 block text-sm font-medium">
+            Rechercher
+          </label>
+
+          <input
+            id="q"
+            name="q"
+            type="search"
+            defaultValue={filters.search ?? ""}
+            placeholder="Marque, modèle ou version..."
+            className="w-full rounded-lg border px-3 py-2"
+          />
+        </div>
         <div>
           <label htmlFor="make" className="mb-1 block text-sm font-medium">
             Marque
@@ -391,8 +407,11 @@ export default async function VehiclesPage({
       </form>
 
       <p className="mb-6 text-sm text-neutral-600">
-        {vehicles.length} véhicule
-        {vehicles.length > 1 ? "s" : ""}
+        {pagination.total} véhicule
+        {pagination.total > 1 ? "s" : ""}
+        {filters.search
+          ? ` trouvé${pagination.total > 1 ? "s" : ""} pour « ${filters.search} »`
+          : ""}
       </p>
 
       {vehicles.length === 0 ? (

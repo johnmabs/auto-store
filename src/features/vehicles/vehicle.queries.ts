@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 const VEHICLES_PER_PAGE = 9;
 
 export type VehicleFilters = {
+  search?: string;
   make?: string;
   location?: "ABROAD" | "IN_TRANSIT" | "IN_CONGO";
   status?: "AVAILABLE" | "RESERVED" | "SOLD";
@@ -315,6 +316,29 @@ function buildVehicleWhere(filters: VehicleFilters) {
           lte: filters.maxPrice,
         }),
       },
+    }),
+
+    ...(filters.search && {
+      OR: [
+        {
+          make: {
+            contains: filters.search,
+            mode: "insensitive" as const,
+          },
+        },
+        {
+          model: {
+            contains: filters.search,
+            mode: "insensitive" as const,
+          },
+        },
+        {
+          variant: {
+            contains: filters.search,
+            mode: "insensitive" as const,
+          },
+        },
+      ],
     }),
   };
 }
