@@ -60,7 +60,10 @@ export async function getVehicles(filters: VehicleFilters = {}) {
         take: 1,
         select: {
           url: true,
+          publicId: true,
           alt: true,
+          width: true,
+          height: true,
         },
       },
     },
@@ -130,7 +133,10 @@ export async function getFeaturedVehicles(limit = 6) {
 
         select: {
           url: true,
+          publicId: true,
           alt: true,
+          width: true,
+          height: true,
         },
       },
     },
@@ -191,7 +197,10 @@ export async function getAdminVehicles() {
         take: 1,
         select: {
           url: true,
+          publicId: true,
           alt: true,
+          width: true,
+          height: true,
         },
       },
     },

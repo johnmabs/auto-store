@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Image from "next/image";
 
 import { getAdminVehicleById } from "@/features/vehicles/vehicle.queries";
 import { EditVehicleForm } from "@/features/vehicles/edit-vehicle-form";
@@ -53,11 +54,13 @@ export default async function EditVehiclePage({
               key={image.id}
               className="overflow-hidden rounded-xl border bg-white"
             >
-              <div className="relative aspect-[4/3] bg-neutral-100">
-                <img
+              <div className="relative aspect-4/3 bg-neutral-100">
+                <Image
                   src={image.url}
                   alt={image.alt ?? `${vehicle.make} ${vehicle.model}`}
-                  className="h-full w-full object-cover"
+                  fill
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  className="object-cover"
                 />
 
                 {image.isPrimary && (

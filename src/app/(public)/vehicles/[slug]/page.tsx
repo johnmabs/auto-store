@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Image from "next/image";
 
 import { getVehicleBySlug } from "@/features/vehicles/vehicle.queries";
 import { CustomerRequestForm } from "@/features/requests/customer-request-form";
@@ -17,28 +18,6 @@ type VehiclePageProps = {
   }>;
 };
 
-function getLocationLabel(
-  locationStatus: "ABROAD" | "IN_TRANSIT" | "IN_CONGO",
-  congoCity: "POINTE_NOIRE" | "BRAZZAVILLE" | null,
-  originCountry: string,
-) {
-  if (locationStatus === "IN_CONGO") {
-    if (congoCity === "POINTE_NOIRE") {
-      return "Disponible à Pointe-Noire";
-    }
-
-    if (congoCity === "BRAZZAVILLE") {
-      return "Disponible à Brazzaville";
-    }
-  }
-
-  if (locationStatus === "IN_TRANSIT") {
-    return "En transit vers le Congo";
-  }
-
-  return `Disponible à l'importation depuis ${originCountry}`;
-}
-
 export default async function VehiclePage({ params }: VehiclePageProps) {
   const { slug } = await params;
 
@@ -55,12 +34,15 @@ export default async function VehiclePage({ params }: VehiclePageProps) {
     <main className="mx-auto max-w-7xl px-6 py-12">
       <div className="grid gap-10 lg:grid-cols-[1.4fr_1fr]">
         <section>
-          <div className="aspect-4/3 overflow-hidden rounded-xl bg-neutral-100">
+          <div className="relative aspect-16/10 overflow-hidden rounded-xl bg-neutral-100">
             {mainImage ? (
-              <img
+              <Image
                 src={mainImage.url}
                 alt={mainImage.alt ?? `${vehicle.make} ${vehicle.model}`}
-                className="h-full w-full object-cover"
+                fill
+                priority
+                sizes="(max-width: 1024px) 100vw, 65vw"
+                className="object-cover"
               />
             ) : (
               <div className="flex h-full items-center justify-center text-neutral-500">
@@ -70,16 +52,18 @@ export default async function VehiclePage({ params }: VehiclePageProps) {
           </div>
 
           {vehicle.images.length > 1 && (
-            <div className="mt-4 grid grid-cols-3 gap-3 sm:grid-cols-4">
+            <div className="mt-4 grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5">
               {vehicle.images.map((image) => (
                 <div
                   key={image.id}
-                  className="aspect-4/3 overflow-hidden rounded-lg bg-neutral-100"
+                  className="relative aspect-4/3 overflow-hidden rounded-lg bg-neutral-100"
                 >
-                  <img
+                  <Image
                     src={image.url}
                     alt={image.alt ?? `${vehicle.make} ${vehicle.model}`}
-                    className="h-full w-full object-cover"
+                    fill
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    className="object-cover"
                   />
                 </div>
               ))}

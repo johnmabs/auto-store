@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 import {
   formatVehiclePrice,
@@ -21,7 +22,10 @@ type VehicleCardProps = {
     priceBasis: "VEHICLE_ONLY" | "LANDED";
     images: {
       url: string;
+      publicId: string;
       alt: string | null;
+      width: number | null;
+      height: number | null;
     }[];
   };
 };
@@ -31,12 +35,14 @@ export function VehicleCard({ vehicle }: VehicleCardProps) {
 
   return (
     <article className="overflow-hidden rounded-xl border bg-white">
-      <div className="aspect-4/3 bg-neutral-100">
+      <div className="relative aspect-4/3 overflow-hidden bg-neutral-100">
         {primaryImage ? (
-          <img
+          <Image
             src={primaryImage.url}
             alt={primaryImage.alt ?? `${vehicle.make} ${vehicle.model}`}
-            className="h-full w-full object-cover"
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            className="object-cover"
           />
         ) : (
           <div className="flex h-full items-center justify-center text-sm text-neutral-500">
