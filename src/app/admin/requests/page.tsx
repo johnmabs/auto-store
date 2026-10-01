@@ -4,17 +4,6 @@ import { updateCustomerRequestStatus } from "@/features/requests/request.actions
 import { getAdminCustomerRequests } from "@/features/requests/request.queries";
 import { getCustomerRequestStatusLabel } from "@/features/requests/request.formatters";
 
-function getStatusLabel(status: "NEW" | "CONTACTED" | "CLOSED") {
-  switch (status) {
-    case "NEW":
-      return "Nouvelle";
-    case "CONTACTED":
-      return "Contactée";
-    case "CLOSED":
-      return "Clôturée";
-  }
-}
-
 export default async function AdminRequestsPage() {
   const requests = await getAdminCustomerRequests();
 
