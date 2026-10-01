@@ -2,9 +2,7 @@ import { prisma } from "@/lib/prisma";
 
 export type VehicleFilters = {
   make?: string;
-
   location?: "ABROAD" | "IN_TRANSIT" | "IN_CONGO";
-
   status?: "AVAILABLE" | "RESERVED" | "SOLD";
 
   fuelType?:
@@ -31,7 +29,11 @@ export type VehicleFilters = {
 
   minPrice?: number;
   maxPrice?: number;
+
+  sort?: VehicleSort;
 };
+
+export type VehicleSort = "recent" | "price_asc" | "price_desc" | "year_desc";
 
 export async function getVehicles(filters: VehicleFilters = {}) {
   return prisma.vehicle.findMany({
@@ -83,9 +85,14 @@ export async function getVehicles(filters: VehicleFilters = {}) {
       }),
     },
 
-    orderBy: {
-      createdAt: "desc",
-    },
+    orderBy:
+      filters.sort === "price_asc"
+        ? { price: "asc" }
+        : filters.sort === "price_desc"
+          ? { price: "desc" }
+          : filters.sort === "year_desc"
+            ? { year: "desc" }
+            : { createdAt: "desc" },
 
     select: {
       id: true,

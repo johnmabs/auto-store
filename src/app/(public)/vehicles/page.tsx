@@ -12,20 +12,19 @@ type VehiclesPageProps = {
     make?: string;
     location?: string;
     status?: string;
-
     fuelType?: string;
     bodyType?: string;
-
     minYear?: string;
     maxYear?: string;
-
     minPrice?: string;
     maxPrice?: string;
+    sort?: string;
   }>;
 };
 
 const allowedLocations = ["ABROAD", "IN_TRANSIT", "IN_CONGO"] as const;
 const allowedStatuses = ["AVAILABLE", "RESERVED", "SOLD"] as const;
+
 const allowedFuelTypes = [
   "GASOLINE",
   "DIESEL",
@@ -34,6 +33,7 @@ const allowedFuelTypes = [
   "ELECTRIC",
   "OTHER",
 ] as const;
+
 const allowedBodyTypes = [
   "SUV",
   "SEDAN",
@@ -44,6 +44,13 @@ const allowedBodyTypes = [
   "WAGON",
   "CONVERTIBLE",
   "OTHER",
+] as const;
+
+const allowedSorts = [
+  "recent",
+  "price_asc",
+  "price_desc",
+  "year_desc",
 ] as const;
 
 function parseLocation(value?: string): VehicleFilters["location"] {
@@ -104,6 +111,14 @@ function parseBodyType(value?: string): VehicleFilters["bodyType"] {
   return undefined;
 }
 
+function parseSort(value?: string): VehicleFilters["sort"] {
+  if (value && allowedSorts.includes(value as (typeof allowedSorts)[number])) {
+    return value as VehicleFilters["sort"];
+  }
+
+  return "recent";
+}
+
 export default async function VehiclesPage({
   searchParams,
 }: VehiclesPageProps) {
@@ -111,22 +126,15 @@ export default async function VehiclesPage({
 
   const filters: VehicleFilters = {
     make: params.make || undefined,
-
     location: parseLocation(params.location),
-
     status: parseStatus(params.status),
-
     fuelType: parseFuelType(params.fuelType),
-
     bodyType: parseBodyType(params.bodyType),
-
     minYear: parseNumber(params.minYear),
-
     maxYear: parseNumber(params.maxYear),
-
     minPrice: parseNumber(params.minPrice),
-
     maxPrice: parseNumber(params.maxPrice),
+    sort: parseSort(params.sort),
   };
 
   const [vehicles, makes] = await Promise.all([
@@ -245,24 +253,33 @@ export default async function VehiclesPage({
             className="w-full rounded-lg border px-3 py-2"
           >
             <option value="">Toutes</option>
-
             <option value="SUV">SUV</option>
-
             <option value="SEDAN">Berline</option>
-
             <option value="HATCHBACK">Compacte</option>
-
             <option value="COUPE">Coupé</option>
-
             <option value="PICKUP">Pick-up</option>
-
             <option value="MINIVAN">Minivan</option>
-
             <option value="WAGON">Break</option>
-
             <option value="CONVERTIBLE">Cabriolet</option>
-
             <option value="OTHER">Autre</option>
+          </select>
+        </div>
+
+        <div>
+          <label htmlFor="sort" className="mb-1 block text-sm font-medium">
+            Trier par
+          </label>
+
+          <select
+            id="sort"
+            name="sort"
+            defaultValue={filters.sort ?? "recent"}
+            className="w-full rounded-lg border px-3 py-2"
+          >
+            <option value="recent">Plus récents</option>
+            <option value="price_asc">Prix croissant</option>
+            <option value="price_desc">Prix décroissant</option>
+            <option value="year_desc">Année la plus récente</option>
           </select>
         </div>
 
