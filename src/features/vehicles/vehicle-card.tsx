@@ -22,10 +22,7 @@ type VehicleCardProps = {
     priceBasis: "VEHICLE_ONLY" | "LANDED";
     images: {
       url: string;
-      publicId: string;
       alt: string | null;
-      width: number | null;
-      height: number | null;
     }[];
   };
 };

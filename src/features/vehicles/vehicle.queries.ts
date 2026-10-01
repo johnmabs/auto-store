@@ -2,8 +2,35 @@ import { prisma } from "@/lib/prisma";
 
 export type VehicleFilters = {
   make?: string;
+
   location?: "ABROAD" | "IN_TRANSIT" | "IN_CONGO";
+
   status?: "AVAILABLE" | "RESERVED" | "SOLD";
+
+  fuelType?:
+    | "GASOLINE"
+    | "DIESEL"
+    | "HYBRID"
+    | "PLUGIN_HYBRID"
+    | "ELECTRIC"
+    | "OTHER";
+
+  bodyType?:
+    | "SUV"
+    | "SEDAN"
+    | "HATCHBACK"
+    | "COUPE"
+    | "PICKUP"
+    | "MINIVAN"
+    | "WAGON"
+    | "CONVERTIBLE"
+    | "OTHER";
+
+  minYear?: number;
+  maxYear?: number;
+
+  minPrice?: number;
+  maxPrice?: number;
 };
 
 export async function getVehicles(filters: VehicleFilters = {}) {
@@ -21,6 +48,39 @@ export async function getVehicles(filters: VehicleFilters = {}) {
       ...(filters.location && {
         locationStatus: filters.location,
       }),
+
+      ...(filters.fuelType && {
+        fuelType: filters.fuelType,
+      }),
+
+      ...(filters.bodyType && {
+        bodyType: filters.bodyType,
+      }),
+
+      ...((filters.minYear !== undefined || filters.maxYear !== undefined) && {
+        year: {
+          ...(filters.minYear !== undefined && {
+            gte: filters.minYear,
+          }),
+
+          ...(filters.maxYear !== undefined && {
+            lte: filters.maxYear,
+          }),
+        },
+      }),
+
+      ...((filters.minPrice !== undefined ||
+        filters.maxPrice !== undefined) && {
+        price: {
+          ...(filters.minPrice !== undefined && {
+            gte: filters.minPrice,
+          }),
+
+          ...(filters.maxPrice !== undefined && {
+            lte: filters.maxPrice,
+          }),
+        },
+      }),
     },
 
     orderBy: {
@@ -36,8 +96,8 @@ export async function getVehicles(filters: VehicleFilters = {}) {
       variant: true,
       year: true,
       mileage: true,
-      bodyType: true,
 
+      bodyType: true,
       fuelType: true,
       transmission: true,
 
@@ -58,12 +118,10 @@ export async function getVehicles(filters: VehicleFilters = {}) {
           isPrimary: true,
         },
         take: 1,
+
         select: {
           url: true,
-          publicId: true,
           alt: true,
-          width: true,
-          height: true,
         },
       },
     },

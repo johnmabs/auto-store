@@ -12,12 +12,39 @@ type VehiclesPageProps = {
     make?: string;
     location?: string;
     status?: string;
+
+    fuelType?: string;
+    bodyType?: string;
+
+    minYear?: string;
+    maxYear?: string;
+
+    minPrice?: string;
+    maxPrice?: string;
   }>;
 };
 
 const allowedLocations = ["ABROAD", "IN_TRANSIT", "IN_CONGO"] as const;
-
 const allowedStatuses = ["AVAILABLE", "RESERVED", "SOLD"] as const;
+const allowedFuelTypes = [
+  "GASOLINE",
+  "DIESEL",
+  "HYBRID",
+  "PLUGIN_HYBRID",
+  "ELECTRIC",
+  "OTHER",
+] as const;
+const allowedBodyTypes = [
+  "SUV",
+  "SEDAN",
+  "HATCHBACK",
+  "COUPE",
+  "PICKUP",
+  "MINIVAN",
+  "WAGON",
+  "CONVERTIBLE",
+  "OTHER",
+] as const;
 
 function parseLocation(value?: string): VehicleFilters["location"] {
   if (
@@ -41,6 +68,42 @@ function parseStatus(value?: string): VehicleFilters["status"] {
   return undefined;
 }
 
+function parseNumber(value?: string) {
+  if (!value) {
+    return undefined;
+  }
+
+  const number = Number(value);
+
+  if (!Number.isFinite(number)) {
+    return undefined;
+  }
+
+  return number;
+}
+
+function parseFuelType(value?: string): VehicleFilters["fuelType"] {
+  if (
+    value &&
+    allowedFuelTypes.includes(value as (typeof allowedFuelTypes)[number])
+  ) {
+    return value as VehicleFilters["fuelType"];
+  }
+
+  return undefined;
+}
+
+function parseBodyType(value?: string): VehicleFilters["bodyType"] {
+  if (
+    value &&
+    allowedBodyTypes.includes(value as (typeof allowedBodyTypes)[number])
+  ) {
+    return value as VehicleFilters["bodyType"];
+  }
+
+  return undefined;
+}
+
 export default async function VehiclesPage({
   searchParams,
 }: VehiclesPageProps) {
@@ -48,8 +111,22 @@ export default async function VehiclesPage({
 
   const filters: VehicleFilters = {
     make: params.make || undefined,
+
     location: parseLocation(params.location),
+
     status: parseStatus(params.status),
+
+    fuelType: parseFuelType(params.fuelType),
+
+    bodyType: parseBodyType(params.bodyType),
+
+    minYear: parseNumber(params.minYear),
+
+    maxYear: parseNumber(params.maxYear),
+
+    minPrice: parseNumber(params.minPrice),
+
+    maxPrice: parseNumber(params.maxPrice),
   };
 
   const [vehicles, makes] = await Promise.all([
@@ -71,7 +148,7 @@ export default async function VehiclesPage({
       <form
         action="/vehicles"
         method="get"
-        className="mb-10 grid gap-4 rounded-xl border p-5 md:grid-cols-4"
+        className="mb-10 grid gap-4 rounded-xl border p-5 md:grid-cols-2 lg:grid-cols-4"
       >
         <div>
           <label htmlFor="make" className="mb-1 block text-sm font-medium">
@@ -127,6 +204,128 @@ export default async function VehiclesPage({
             <option value="RESERVED">Réservé</option>
             <option value="SOLD">Vendu</option>
           </select>
+        </div>
+
+        <div>
+          <label htmlFor="fuelType" className="mb-1 block text-sm font-medium">
+            Carburant
+          </label>
+
+          <select
+            id="fuelType"
+            name="fuelType"
+            defaultValue={filters.fuelType ?? ""}
+            className="w-full rounded-lg border px-3 py-2"
+          >
+            <option value="">Tous</option>
+
+            <option value="GASOLINE">Essence</option>
+
+            <option value="DIESEL">Diesel</option>
+
+            <option value="HYBRID">Hybride</option>
+
+            <option value="PLUGIN_HYBRID">Hybride rechargeable</option>
+
+            <option value="ELECTRIC">Électrique</option>
+
+            <option value="OTHER">Autre</option>
+          </select>
+        </div>
+
+        <div>
+          <label htmlFor="bodyType" className="mb-1 block text-sm font-medium">
+            Carrosserie
+          </label>
+
+          <select
+            id="bodyType"
+            name="bodyType"
+            defaultValue={filters.bodyType ?? ""}
+            className="w-full rounded-lg border px-3 py-2"
+          >
+            <option value="">Toutes</option>
+
+            <option value="SUV">SUV</option>
+
+            <option value="SEDAN">Berline</option>
+
+            <option value="HATCHBACK">Compacte</option>
+
+            <option value="COUPE">Coupé</option>
+
+            <option value="PICKUP">Pick-up</option>
+
+            <option value="MINIVAN">Minivan</option>
+
+            <option value="WAGON">Break</option>
+
+            <option value="CONVERTIBLE">Cabriolet</option>
+
+            <option value="OTHER">Autre</option>
+          </select>
+        </div>
+
+        <div>
+          <label htmlFor="minYear" className="mb-1 block text-sm font-medium">
+            Année min.
+          </label>
+
+          <input
+            id="minYear"
+            name="minYear"
+            type="number"
+            min={1950}
+            defaultValue={filters.minYear ?? ""}
+            className="w-full rounded-lg border px-3 py-2"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="maxYear" className="mb-1 block text-sm font-medium">
+            Année max.
+          </label>
+
+          <input
+            id="maxYear"
+            name="maxYear"
+            type="number"
+            min={1950}
+            defaultValue={filters.maxYear ?? ""}
+            className="w-full rounded-lg border px-3 py-2"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="minPrice" className="mb-1 block text-sm font-medium">
+            Prix min.
+          </label>
+
+          <input
+            id="minPrice"
+            name="minPrice"
+            type="number"
+            min={0}
+            step={100000}
+            defaultValue={filters.minPrice ?? ""}
+            className="w-full rounded-lg border px-3 py-2"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="maxPrice" className="mb-1 block text-sm font-medium">
+            Prix max.
+          </label>
+
+          <input
+            id="maxPrice"
+            name="maxPrice"
+            type="number"
+            min={0}
+            step={100000}
+            defaultValue={filters.maxPrice ?? ""}
+            className="w-full rounded-lg border px-3 py-2"
+          />
         </div>
 
         <div className="flex items-end gap-2">
