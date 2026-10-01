@@ -25,9 +25,10 @@ type VehicleCardProps = {
       alt: string | null;
     }[];
   };
+  priority?: boolean;
 };
 
-export function VehicleCard({ vehicle }: VehicleCardProps) {
+export function VehicleCard({ vehicle, priority = false }: VehicleCardProps) {
   const primaryImage = vehicle.images[0];
 
   return (
@@ -39,6 +40,7 @@ export function VehicleCard({ vehicle }: VehicleCardProps) {
             alt={primaryImage.alt ?? `${vehicle.make} ${vehicle.model}`}
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            loading={priority ? "eager" : "lazy"}
             className="object-cover"
           />
         ) : (
