@@ -6,6 +6,7 @@ import {
   type VehicleFilters,
 } from "@/features/vehicles/vehicle.queries";
 import { VehicleCard } from "@/features/vehicles/vehicle-card";
+import { VehicleFiltersPanel } from "@/features/vehicles/vehicle-filters-panel";
 
 type VehiclesPageProps = {
   searchParams: Promise<{
@@ -338,227 +339,242 @@ export default async function VehiclesPage({
           l’importation.
         </p>
       </header>
+      <VehicleFiltersPanel activeCount={activeFilters.length}>
+        <form
+          action="/vehicles"
+          method="get"
+          className="grid gap-4 md:grid-cols-2 lg:grid-cols-4"
+        >
+          <div className="md:col-span-2 lg:col-span-2">
+            <label htmlFor="q" className="mb-1 block text-sm font-medium">
+              Rechercher
+            </label>
 
-      <form
-        action="/vehicles"
-        method="get"
-        className="mb-10 grid gap-4 rounded-xl border p-5 md:grid-cols-2 lg:grid-cols-4"
-      >
-        <div className="md:col-span-2 lg:col-span-2">
-          <label htmlFor="q" className="mb-1 block text-sm font-medium">
-            Rechercher
-          </label>
+            <input
+              id="q"
+              name="q"
+              type="search"
+              defaultValue={filters.search ?? ""}
+              placeholder="Marque, modèle ou version..."
+              className="w-full rounded-lg border px-3 py-2"
+            />
+          </div>
+          <div>
+            <label htmlFor="make" className="mb-1 block text-sm font-medium">
+              Marque
+            </label>
 
-          <input
-            id="q"
-            name="q"
-            type="search"
-            defaultValue={filters.search ?? ""}
-            placeholder="Marque, modèle ou version..."
-            className="w-full rounded-lg border px-3 py-2"
-          />
-        </div>
-        <div>
-          <label htmlFor="make" className="mb-1 block text-sm font-medium">
-            Marque
-          </label>
+            <select
+              id="make"
+              name="make"
+              defaultValue={filters.make ?? ""}
+              className="w-full rounded-lg border px-3 py-2"
+            >
+              <option value="">Toutes les marques</option>
 
-          <select
-            id="make"
-            name="make"
-            defaultValue={filters.make ?? ""}
-            className="w-full rounded-lg border px-3 py-2"
-          >
-            <option value="">Toutes les marques</option>
+              {makes.map((make) => (
+                <option key={make} value={make}>
+                  {make}
+                </option>
+              ))}
+            </select>
+          </div>
 
-            {makes.map((make) => (
-              <option key={make} value={make}>
-                {make}
-              </option>
-            ))}
-          </select>
-        </div>
+          <div>
+            <label
+              htmlFor="location"
+              className="mb-1 block text-sm font-medium"
+            >
+              Localisation
+            </label>
 
-        <div>
-          <label htmlFor="location" className="mb-1 block text-sm font-medium">
-            Localisation
-          </label>
+            <select
+              id="location"
+              name="location"
+              defaultValue={filters.location ?? ""}
+              className="w-full rounded-lg border px-3 py-2"
+            >
+              <option value="">Toutes</option>
+              <option value="ABROAD">À l&apos;étranger</option>
+              <option value="IN_TRANSIT">En transit</option>
+              <option value="IN_CONGO">Au Congo</option>
+            </select>
+          </div>
 
-          <select
-            id="location"
-            name="location"
-            defaultValue={filters.location ?? ""}
-            className="w-full rounded-lg border px-3 py-2"
-          >
-            <option value="">Toutes</option>
-            <option value="ABROAD">À l&apos;étranger</option>
-            <option value="IN_TRANSIT">En transit</option>
-            <option value="IN_CONGO">Au Congo</option>
-          </select>
-        </div>
+          <div>
+            <label htmlFor="status" className="mb-1 block text-sm font-medium">
+              Statut
+            </label>
 
-        <div>
-          <label htmlFor="status" className="mb-1 block text-sm font-medium">
-            Statut
-          </label>
+            <select
+              id="status"
+              name="status"
+              defaultValue={filters.status ?? "AVAILABLE"}
+              className="w-full rounded-lg border px-3 py-2"
+            >
+              <option value="AVAILABLE">Disponible</option>
+              <option value="RESERVED">Réservé</option>
+              <option value="SOLD">Vendu</option>
+            </select>
+          </div>
 
-          <select
-            id="status"
-            name="status"
-            defaultValue={filters.status ?? "AVAILABLE"}
-            className="w-full rounded-lg border px-3 py-2"
-          >
-            <option value="AVAILABLE">Disponible</option>
-            <option value="RESERVED">Réservé</option>
-            <option value="SOLD">Vendu</option>
-          </select>
-        </div>
+          <div>
+            <label
+              htmlFor="fuelType"
+              className="mb-1 block text-sm font-medium"
+            >
+              Carburant
+            </label>
 
-        <div>
-          <label htmlFor="fuelType" className="mb-1 block text-sm font-medium">
-            Carburant
-          </label>
+            <select
+              id="fuelType"
+              name="fuelType"
+              defaultValue={filters.fuelType ?? ""}
+              className="w-full rounded-lg border px-3 py-2"
+            >
+              <option value="">Tous</option>
 
-          <select
-            id="fuelType"
-            name="fuelType"
-            defaultValue={filters.fuelType ?? ""}
-            className="w-full rounded-lg border px-3 py-2"
-          >
-            <option value="">Tous</option>
+              <option value="GASOLINE">Essence</option>
 
-            <option value="GASOLINE">Essence</option>
+              <option value="DIESEL">Diesel</option>
 
-            <option value="DIESEL">Diesel</option>
+              <option value="HYBRID">Hybride</option>
 
-            <option value="HYBRID">Hybride</option>
+              <option value="PLUGIN_HYBRID">Hybride rechargeable</option>
 
-            <option value="PLUGIN_HYBRID">Hybride rechargeable</option>
+              <option value="ELECTRIC">Électrique</option>
 
-            <option value="ELECTRIC">Électrique</option>
+              <option value="OTHER">Autre</option>
+            </select>
+          </div>
 
-            <option value="OTHER">Autre</option>
-          </select>
-        </div>
+          <div>
+            <label
+              htmlFor="bodyType"
+              className="mb-1 block text-sm font-medium"
+            >
+              Carrosserie
+            </label>
 
-        <div>
-          <label htmlFor="bodyType" className="mb-1 block text-sm font-medium">
-            Carrosserie
-          </label>
+            <select
+              id="bodyType"
+              name="bodyType"
+              defaultValue={filters.bodyType ?? ""}
+              className="w-full rounded-lg border px-3 py-2"
+            >
+              <option value="">Toutes</option>
+              <option value="SUV">SUV</option>
+              <option value="SEDAN">Berline</option>
+              <option value="HATCHBACK">Compacte</option>
+              <option value="COUPE">Coupé</option>
+              <option value="PICKUP">Pick-up</option>
+              <option value="MINIVAN">Minivan</option>
+              <option value="WAGON">Break</option>
+              <option value="CONVERTIBLE">Cabriolet</option>
+              <option value="OTHER">Autre</option>
+            </select>
+          </div>
 
-          <select
-            id="bodyType"
-            name="bodyType"
-            defaultValue={filters.bodyType ?? ""}
-            className="w-full rounded-lg border px-3 py-2"
-          >
-            <option value="">Toutes</option>
-            <option value="SUV">SUV</option>
-            <option value="SEDAN">Berline</option>
-            <option value="HATCHBACK">Compacte</option>
-            <option value="COUPE">Coupé</option>
-            <option value="PICKUP">Pick-up</option>
-            <option value="MINIVAN">Minivan</option>
-            <option value="WAGON">Break</option>
-            <option value="CONVERTIBLE">Cabriolet</option>
-            <option value="OTHER">Autre</option>
-          </select>
-        </div>
+          <div>
+            <label htmlFor="sort" className="mb-1 block text-sm font-medium">
+              Trier par
+            </label>
 
-        <div>
-          <label htmlFor="sort" className="mb-1 block text-sm font-medium">
-            Trier par
-          </label>
+            <select
+              id="sort"
+              name="sort"
+              defaultValue={filters.sort ?? "recent"}
+              className="w-full rounded-lg border px-3 py-2"
+            >
+              <option value="recent">Plus récents</option>
+              <option value="price_asc">Prix croissant</option>
+              <option value="price_desc">Prix décroissant</option>
+              <option value="year_desc">Année la plus récente</option>
+            </select>
+          </div>
 
-          <select
-            id="sort"
-            name="sort"
-            defaultValue={filters.sort ?? "recent"}
-            className="w-full rounded-lg border px-3 py-2"
-          >
-            <option value="recent">Plus récents</option>
-            <option value="price_asc">Prix croissant</option>
-            <option value="price_desc">Prix décroissant</option>
-            <option value="year_desc">Année la plus récente</option>
-          </select>
-        </div>
+          <div>
+            <label htmlFor="minYear" className="mb-1 block text-sm font-medium">
+              Année min.
+            </label>
 
-        <div>
-          <label htmlFor="minYear" className="mb-1 block text-sm font-medium">
-            Année min.
-          </label>
+            <input
+              id="minYear"
+              name="minYear"
+              type="number"
+              min={1950}
+              defaultValue={filters.minYear ?? ""}
+              className="w-full rounded-lg border px-3 py-2"
+            />
+          </div>
 
-          <input
-            id="minYear"
-            name="minYear"
-            type="number"
-            min={1950}
-            defaultValue={filters.minYear ?? ""}
-            className="w-full rounded-lg border px-3 py-2"
-          />
-        </div>
+          <div>
+            <label htmlFor="maxYear" className="mb-1 block text-sm font-medium">
+              Année max.
+            </label>
 
-        <div>
-          <label htmlFor="maxYear" className="mb-1 block text-sm font-medium">
-            Année max.
-          </label>
+            <input
+              id="maxYear"
+              name="maxYear"
+              type="number"
+              min={1950}
+              defaultValue={filters.maxYear ?? ""}
+              className="w-full rounded-lg border px-3 py-2"
+            />
+          </div>
 
-          <input
-            id="maxYear"
-            name="maxYear"
-            type="number"
-            min={1950}
-            defaultValue={filters.maxYear ?? ""}
-            className="w-full rounded-lg border px-3 py-2"
-          />
-        </div>
+          <div>
+            <label
+              htmlFor="minPrice"
+              className="mb-1 block text-sm font-medium"
+            >
+              Prix min.
+            </label>
 
-        <div>
-          <label htmlFor="minPrice" className="mb-1 block text-sm font-medium">
-            Prix min.
-          </label>
+            <input
+              id="minPrice"
+              name="minPrice"
+              type="number"
+              min={0}
+              step={100000}
+              defaultValue={filters.minPrice ?? ""}
+              className="w-full rounded-lg border px-3 py-2"
+            />
+          </div>
 
-          <input
-            id="minPrice"
-            name="minPrice"
-            type="number"
-            min={0}
-            step={100000}
-            defaultValue={filters.minPrice ?? ""}
-            className="w-full rounded-lg border px-3 py-2"
-          />
-        </div>
+          <div>
+            <label
+              htmlFor="maxPrice"
+              className="mb-1 block text-sm font-medium"
+            >
+              Prix max.
+            </label>
 
-        <div>
-          <label htmlFor="maxPrice" className="mb-1 block text-sm font-medium">
-            Prix max.
-          </label>
+            <input
+              id="maxPrice"
+              name="maxPrice"
+              type="number"
+              min={0}
+              step={100000}
+              defaultValue={filters.maxPrice ?? ""}
+              className="w-full rounded-lg border px-3 py-2"
+            />
+          </div>
 
-          <input
-            id="maxPrice"
-            name="maxPrice"
-            type="number"
-            min={0}
-            step={100000}
-            defaultValue={filters.maxPrice ?? ""}
-            className="w-full rounded-lg border px-3 py-2"
-          />
-        </div>
+          <div className="flex items-end gap-2">
+            <button
+              type="submit"
+              className="rounded-lg bg-black px-4 py-2 text-white"
+            >
+              Filtrer
+            </button>
 
-        <div className="flex items-end gap-2">
-          <button
-            type="submit"
-            className="rounded-lg bg-black px-4 py-2 text-white"
-          >
-            Filtrer
-          </button>
-
-          <Link href="/vehicles" className="rounded-lg border px-4 py-2">
-            Réinitialiser
-          </Link>
-        </div>
-      </form>
-
+            <Link href="/vehicles" className="rounded-lg border px-4 py-2">
+              Réinitialiser
+            </Link>
+          </div>
+        </form>
+      </VehicleFiltersPanel>
       {activeFilters.length > 0 && (
         <div className="mb-6 flex flex-wrap items-center gap-2">
           <span className="text-sm text-neutral-500">Filtres actifs :</span>
