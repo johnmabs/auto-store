@@ -148,6 +148,82 @@ function buildPageHref(
   return `/vehicles?${search.toString()}`;
 }
 
+function buildRemoveFilterHref(
+  params: Record<string, string | undefined>,
+  keyToRemove: string,
+) {
+  const search = new URLSearchParams();
+
+  for (const [key, value] of Object.entries(params)) {
+    if (value && key !== keyToRemove && key !== "page") {
+      search.set(key, value);
+    }
+  }
+
+  const query = search.toString();
+
+  return query ? `/vehicles?${query}` : "/vehicles";
+}
+
+function getFuelFilterLabel(value: VehicleFilters["fuelType"]) {
+  switch (value) {
+    case "GASOLINE":
+      return "Essence";
+
+    case "DIESEL":
+      return "Diesel";
+
+    case "HYBRID":
+      return "Hybride";
+
+    case "PLUGIN_HYBRID":
+      return "Hybride rechargeable";
+
+    case "ELECTRIC":
+      return "Électrique";
+
+    case "OTHER":
+      return "Autre";
+
+    default:
+      return "";
+  }
+}
+
+function getBodyTypeFilterLabel(value: VehicleFilters["bodyType"]) {
+  switch (value) {
+    case "SUV":
+      return "SUV";
+
+    case "SEDAN":
+      return "Berline";
+
+    case "HATCHBACK":
+      return "Compacte";
+
+    case "COUPE":
+      return "Coupé";
+
+    case "PICKUP":
+      return "Pick-up";
+
+    case "MINIVAN":
+      return "Minivan";
+
+    case "WAGON":
+      return "Break";
+
+    case "CONVERTIBLE":
+      return "Cabriolet";
+
+    case "OTHER":
+      return "Autre";
+
+    default:
+      return "";
+  }
+}
+
 export default async function VehiclesPage({
   searchParams,
 }: VehiclesPageProps) {
@@ -174,6 +250,83 @@ export default async function VehiclesPage({
   ]);
 
   const { vehicles, pagination } = vehicleResult;
+
+  const activeFilters: {
+    key: string;
+    label: string;
+  }[] = [];
+
+  if (filters.search) {
+    activeFilters.push({
+      key: "q",
+      label: `Recherche : ${filters.search}`,
+    });
+  }
+
+  if (filters.make) {
+    activeFilters.push({
+      key: "make",
+      label: filters.make,
+    });
+  }
+
+  if (filters.location) {
+    activeFilters.push({
+      key: "location",
+      label:
+        filters.location === "IN_CONGO"
+          ? "Au Congo"
+          : filters.location === "IN_TRANSIT"
+            ? "En transit"
+            : "À l'étranger",
+    });
+  }
+
+  if (filters.fuelType) {
+    activeFilters.push({
+      key: "fuelType",
+      label: getFuelFilterLabel(filters.fuelType),
+    });
+  }
+
+  if (filters.bodyType) {
+    activeFilters.push({
+      key: "bodyType",
+      label: getBodyTypeFilterLabel(filters.bodyType),
+    });
+  }
+
+  if (filters.minYear !== undefined) {
+    activeFilters.push({
+      key: "minYear",
+      label: `À partir de ${filters.minYear}`,
+    });
+  }
+
+  if (filters.maxYear !== undefined) {
+    activeFilters.push({
+      key: "maxYear",
+      label: `Jusqu'à ${filters.maxYear}`,
+    });
+  }
+
+  if (filters.minPrice !== undefined) {
+    activeFilters.push({
+      key: "minPrice",
+      label: `Min. ${new Intl.NumberFormat("fr-FR").format(
+        filters.minPrice,
+      )} FCFA`,
+    });
+  }
+
+  if (filters.maxPrice !== undefined) {
+    activeFilters.push({
+      key: "maxPrice",
+      label: `Max. ${new Intl.NumberFormat("fr-FR").format(
+        filters.maxPrice,
+      )} FCFA`,
+    });
+  }
 
   return (
     <main className="mx-auto max-w-7xl px-6 py-12">
@@ -405,6 +558,33 @@ export default async function VehiclesPage({
           </Link>
         </div>
       </form>
+
+      {activeFilters.length > 0 && (
+        <div className="mb-6 flex flex-wrap items-center gap-2">
+          <span className="text-sm text-neutral-500">Filtres actifs :</span>
+
+          {activeFilters.map((filter) => (
+            <Link
+              key={filter.key}
+              href={buildRemoveFilterHref(params, filter.key)}
+              className="inline-flex items-center gap-2 rounded-full border bg-white px-3 py-1.5 text-sm hover:bg-neutral-50"
+            >
+              <span>{filter.label}</span>
+
+              <span aria-hidden="true" className="text-neutral-400">
+                ×
+              </span>
+            </Link>
+          ))}
+
+          <Link
+            href="/vehicles"
+            className="ml-1 text-sm underline underline-offset-4"
+          >
+            Tout effacer
+          </Link>
+        </div>
+      )}
 
       <p className="mb-6 text-sm text-neutral-600">
         {pagination.total} véhicule
