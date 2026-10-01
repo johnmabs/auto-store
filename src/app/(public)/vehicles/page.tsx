@@ -19,6 +19,7 @@ type VehiclesPageProps = {
     minPrice?: string;
     maxPrice?: string;
     sort?: string;
+    page?: string;
   }>;
 };
 
@@ -119,6 +120,33 @@ function parseSort(value?: string): VehicleFilters["sort"] {
   return "recent";
 }
 
+function parsePage(value?: string) {
+  const page = Number(value);
+
+  if (!Number.isInteger(page) || page < 1) {
+    return 1;
+  }
+
+  return page;
+}
+
+function buildPageHref(
+  params: Record<string, string | undefined>,
+  page: number,
+) {
+  const search = new URLSearchParams();
+
+  for (const [key, value] of Object.entries(params)) {
+    if (value && key !== "page") {
+      search.set(key, value);
+    }
+  }
+
+  search.set("page", String(page));
+
+  return `/vehicles?${search.toString()}`;
+}
+
 export default async function VehiclesPage({
   searchParams,
 }: VehiclesPageProps) {
@@ -135,12 +163,15 @@ export default async function VehiclesPage({
     minPrice: parseNumber(params.minPrice),
     maxPrice: parseNumber(params.maxPrice),
     sort: parseSort(params.sort),
+    page: parsePage(params.page),
   };
 
-  const [vehicles, makes] = await Promise.all([
+  const [vehicleResult, makes] = await Promise.all([
     getVehicles(filters),
     getVehicleMakes(),
   ]);
+
+  const { vehicles, pagination } = vehicleResult;
 
   return (
     <main className="mx-auto max-w-7xl px-6 py-12">
@@ -387,6 +418,35 @@ export default async function VehiclesPage({
             />
           ))}
         </div>
+      )}
+
+      {pagination.totalPages > 1 && (
+        <nav
+          aria-label="Pagination"
+          className="mt-10 flex items-center justify-center gap-2"
+        >
+          {pagination.page > 1 && (
+            <Link
+              href={buildPageHref(params, pagination.page - 1)}
+              className="rounded-lg border px-4 py-2 text-sm"
+            >
+              Précédent
+            </Link>
+          )}
+
+          <span className="px-3 text-sm text-neutral-600">
+            Page {pagination.page} sur {pagination.totalPages}
+          </span>
+
+          {pagination.page < pagination.totalPages && (
+            <Link
+              href={buildPageHref(params, pagination.page + 1)}
+              className="rounded-lg border px-4 py-2 text-sm"
+            >
+              Suivant
+            </Link>
+          )}
+        </nav>
       )}
     </main>
   );

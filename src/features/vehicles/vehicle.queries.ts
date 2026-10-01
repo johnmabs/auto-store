@@ -1,5 +1,7 @@
 import { prisma } from "@/lib/prisma";
 
+const VEHICLES_PER_PAGE = 9;
+
 export type VehicleFilters = {
   make?: string;
   location?: "ABROAD" | "IN_TRANSIT" | "IN_CONGO";
@@ -31,108 +33,88 @@ export type VehicleFilters = {
   maxPrice?: number;
 
   sort?: VehicleSort;
+
+  page?: number;
 };
 
 export type VehicleSort = "recent" | "price_asc" | "price_desc" | "year_desc";
 
 export async function getVehicles(filters: VehicleFilters = {}) {
-  return prisma.vehicle.findMany({
-    where: {
-      status: filters.status ?? "AVAILABLE",
+  const page = Math.max(filters.page ?? 1, 1);
 
-      ...(filters.make && {
-        make: {
-          equals: filters.make,
-          mode: "insensitive",
-        },
-      }),
+  const where = buildVehicleWhere(filters);
 
-      ...(filters.location && {
-        locationStatus: filters.location,
-      }),
+  const [vehicles, total] = await Promise.all([
+    prisma.vehicle.findMany({
+      where,
 
-      ...(filters.fuelType && {
-        fuelType: filters.fuelType,
-      }),
+      orderBy:
+        filters.sort === "price_asc"
+          ? { price: "asc" }
+          : filters.sort === "price_desc"
+            ? { price: "desc" }
+            : filters.sort === "year_desc"
+              ? { year: "desc" }
+              : { createdAt: "desc" },
 
-      ...(filters.bodyType && {
-        bodyType: filters.bodyType,
-      }),
+      skip: (page - 1) * VEHICLES_PER_PAGE,
 
-      ...((filters.minYear !== undefined || filters.maxYear !== undefined) && {
-        year: {
-          ...(filters.minYear !== undefined && {
-            gte: filters.minYear,
-          }),
+      take: VEHICLES_PER_PAGE,
 
-          ...(filters.maxYear !== undefined && {
-            lte: filters.maxYear,
-          }),
-        },
-      }),
+      select: {
+        id: true,
+        slug: true,
 
-      ...((filters.minPrice !== undefined ||
-        filters.maxPrice !== undefined) && {
-        price: {
-          ...(filters.minPrice !== undefined && {
-            gte: filters.minPrice,
-          }),
+        make: true,
+        model: true,
+        variant: true,
+        year: true,
+        mileage: true,
 
-          ...(filters.maxPrice !== undefined && {
-            lte: filters.maxPrice,
-          }),
-        },
-      }),
-    },
+        bodyType: true,
+        fuelType: true,
+        transmission: true,
 
-    orderBy:
-      filters.sort === "price_asc"
-        ? { price: "asc" }
-        : filters.sort === "price_desc"
-          ? { price: "desc" }
-          : filters.sort === "year_desc"
-            ? { year: "desc" }
-            : { createdAt: "desc" },
+        originCountry: true,
+        locationStatus: true,
+        congoCity: true,
 
-    select: {
-      id: true,
-      slug: true,
+        price: true,
+        currency: true,
+        priceBasis: true,
+        priceNegotiable: true,
 
-      make: true,
-      model: true,
-      variant: true,
-      year: true,
-      mileage: true,
+        status: true,
+        featured: true,
 
-      bodyType: true,
-      fuelType: true,
-      transmission: true,
+        images: {
+          where: {
+            isPrimary: true,
+          },
+          take: 1,
 
-      originCountry: true,
-      locationStatus: true,
-      congoCity: true,
-
-      price: true,
-      currency: true,
-      priceBasis: true,
-      priceNegotiable: true,
-
-      status: true,
-      featured: true,
-
-      images: {
-        where: {
-          isPrimary: true,
-        },
-        take: 1,
-
-        select: {
-          url: true,
-          alt: true,
+          select: {
+            url: true,
+            alt: true,
+          },
         },
       },
+    }),
+
+    prisma.vehicle.count({
+      where,
+    }),
+  ]);
+
+  return {
+    vehicles,
+    pagination: {
+      page,
+      perPage: VEHICLES_PER_PAGE,
+      total,
+      totalPages: Math.max(Math.ceil(total / VEHICLES_PER_PAGE), 1),
     },
-  });
+  };
 }
 
 export async function getVehicleBySlug(slug: string) {
@@ -286,4 +268,53 @@ export async function getAdminVehicleById(id: string) {
       },
     },
   });
+}
+
+function buildVehicleWhere(filters: VehicleFilters) {
+  return {
+    status: filters.status ?? "AVAILABLE",
+
+    ...(filters.make && {
+      make: {
+        equals: filters.make,
+        mode: "insensitive" as const,
+      },
+    }),
+
+    ...(filters.location && {
+      locationStatus: filters.location,
+    }),
+
+    ...(filters.fuelType && {
+      fuelType: filters.fuelType,
+    }),
+
+    ...(filters.bodyType && {
+      bodyType: filters.bodyType,
+    }),
+
+    ...((filters.minYear !== undefined || filters.maxYear !== undefined) && {
+      year: {
+        ...(filters.minYear !== undefined && {
+          gte: filters.minYear,
+        }),
+
+        ...(filters.maxYear !== undefined && {
+          lte: filters.maxYear,
+        }),
+      },
+    }),
+
+    ...((filters.minPrice !== undefined || filters.maxPrice !== undefined) && {
+      price: {
+        ...(filters.minPrice !== undefined && {
+          gte: filters.minPrice,
+        }),
+
+        ...(filters.maxPrice !== undefined && {
+          lte: filters.maxPrice,
+        }),
+      },
+    }),
+  };
 }
