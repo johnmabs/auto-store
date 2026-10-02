@@ -1,7 +1,15 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 
 import { VehicleCard } from "@/features/vehicles/vehicle-card";
 import { getFeaturedVehicles } from "@/features/vehicles/vehicle.queries";
+
+export const metadata: Metadata = {
+  title: "Véhicules d'occasion au Congo et à l'importation",
+
+  description:
+    "Auto Store propose des véhicules d'occasion disponibles à Pointe-Noire, Brazzaville, en transit ou à l'importation.",
+};
 
 export default async function HomePage() {
   const featuredVehicles = await getFeaturedVehicles(6);

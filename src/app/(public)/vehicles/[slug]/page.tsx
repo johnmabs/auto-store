@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 
 import { getVehicleBySlug } from "@/features/vehicles/vehicle.queries";
 import { CustomerRequestForm } from "@/features/requests/customer-request-form";
@@ -18,6 +19,62 @@ type VehiclePageProps = {
     slug: string;
   }>;
 };
+
+export async function generateMetadata({
+  params,
+}: VehiclePageProps): Promise<Metadata> {
+  const { slug } = await params;
+
+  const vehicle = await getVehicleBySlug(slug);
+
+  if (!vehicle) {
+    return {
+      title: "Véhicule introuvable",
+    };
+  }
+
+  const title = `${vehicle.make} ${vehicle.model} ${vehicle.year}`;
+
+  const location =
+    vehicle.locationStatus === "IN_CONGO"
+      ? vehicle.congoCity === "POINTE_NOIRE"
+        ? "disponible à Pointe-Noire"
+        : vehicle.congoCity === "BRAZZAVILLE"
+          ? "disponible à Brazzaville"
+          : "disponible au Congo"
+      : vehicle.locationStatus === "IN_TRANSIT"
+        ? "en transit vers le Congo"
+        : `disponible à l'importation depuis ${getVehicleOriginLabel(
+            vehicle.originCountry,
+          ).replace(/^.{2}\s/, "")}`;
+
+  const description =
+    `${title}, ${vehicle.mileage.toLocaleString("fr-FR")} km, ${location}. ` +
+    `Découvrez les caractéristiques, les équipements et les photos du véhicule.`;
+
+  const mainImage =
+    vehicle.images.find((image) => image.isPrimary) ?? vehicle.images[0];
+
+  return {
+    title,
+    description,
+
+    openGraph: {
+      title,
+      description,
+      type: "website",
+
+      images: mainImage
+        ? [
+            {
+              url: mainImage.url,
+              alt: mainImage.alt ?? title,
+            },
+          ]
+        : undefined,
+    },
+  };
+}
 
 export default async function VehiclePage({ params }: VehiclePageProps) {
   const { slug } = await params;

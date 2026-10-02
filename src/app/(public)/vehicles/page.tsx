@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 
 import {
   getVehicleMakes,
@@ -224,6 +225,13 @@ function getBodyTypeFilterLabel(value: VehicleFilters["bodyType"]) {
       return "";
   }
 }
+
+export const metadata: Metadata = {
+  title: "Véhicules",
+
+  description:
+    "Découvrez nos véhicules d'occasion disponibles au Congo, en transit ou à l'importation.",
+};
 
 export default async function VehiclesPage({
   searchParams,
