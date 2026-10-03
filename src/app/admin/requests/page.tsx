@@ -1,9 +1,9 @@
 import Link from "next/link";
+import { notFound } from "next/navigation";
 
-import { updateCustomerRequestStatus } from "@/features/requests/request.actions";
 import { getAdminCustomerRequests } from "@/features/requests/request.queries";
 import { getCustomerRequestStatusLabel } from "@/features/requests/request.formatters";
-import { notFound } from "next/navigation";
+import { RequestStatusActions } from "@/features/requests/request-status-actions";
 
 export default async function AdminRequestsPage() {
   const requests = await getAdminCustomerRequests();
@@ -84,39 +84,10 @@ export default async function AdminRequestsPage() {
 
                 <td className="px-4 py-3">
                   <div className="flex flex-wrap gap-2">
-                    {request.status !== "CONTACTED" && (
-                      <form
-                        action={updateCustomerRequestStatus.bind(
-                          null,
-                          request.id,
-                          "CONTACTED",
-                        )}
-                      >
-                        <button
-                          type="submit"
-                          className="rounded border px-3 py-1 text-xs"
-                        >
-                          Marquer contactée
-                        </button>
-                      </form>
-                    )}
-
-                    {request.status !== "CLOSED" && (
-                      <form
-                        action={updateCustomerRequestStatus.bind(
-                          null,
-                          request.id,
-                          "CLOSED",
-                        )}
-                      >
-                        <button
-                          type="submit"
-                          className="rounded border px-3 py-1 text-xs"
-                        >
-                          Clôturer
-                        </button>
-                      </form>
-                    )}
+                    <RequestStatusActions
+                      requestId={request.id}
+                      status={request.status}
+                    />
 
                     <Link
                       href={`/admin/requests/${request.id}`}

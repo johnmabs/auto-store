@@ -1,13 +1,11 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import {
-  updateCustomerRequestNotes,
-  updateCustomerRequestStatus,
-} from "@/features/requests/request.actions";
+import { updateCustomerRequestNotes } from "@/features/requests/request.actions";
 import { getAdminCustomerRequestById } from "@/features/requests/request.queries";
 import { getCustomerRequestStatusLabel } from "@/features/requests/request.formatters";
 import { getVehicleLocationLabel } from "@/features/vehicles/vehicle.formatters";
+import { RequestStatusActions } from "@/features/requests/request-status-actions";
 
 type AdminRequestPageProps = {
   params: Promise<{
@@ -170,39 +168,10 @@ export default async function AdminRequestPage({
             <h2 className="font-semibold">Suivi</h2>
 
             <div className="mt-4 flex flex-wrap gap-2">
-              {request.status !== "CONTACTED" && (
-                <form
-                  action={updateCustomerRequestStatus.bind(
-                    null,
-                    request.id,
-                    "CONTACTED",
-                  )}
-                >
-                  <button
-                    type="submit"
-                    className="rounded border px-3 py-2 text-sm"
-                  >
-                    Marquer contactée
-                  </button>
-                </form>
-              )}
-
-              {request.status !== "CLOSED" && (
-                <form
-                  action={updateCustomerRequestStatus.bind(
-                    null,
-                    request.id,
-                    "CLOSED",
-                  )}
-                >
-                  <button
-                    type="submit"
-                    className="rounded border px-3 py-2 text-sm"
-                  >
-                    Clôturer
-                  </button>
-                </form>
-              )}
+              <RequestStatusActions
+                requestId={request.id}
+                status={request.status}
+              />
             </div>
           </div>
 

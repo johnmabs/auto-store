@@ -4,6 +4,15 @@ import { auth } from "@/auth";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { customerRequestSchema } from "./request.schema";
+import {
+  canTransitionCustomerRequestStatus,
+  type CustomerRequestStatus,
+} from "./request-status";
+
+export type CustomerRequestActionState = {
+  success: boolean;
+  message?: string;
+};
 
 export type CustomerRequestState = {
   success: boolean;
@@ -92,25 +101,67 @@ export async function createCustomerRequest(
 
 export async function updateCustomerRequestStatus(
   requestId: string,
-  status: "NEW" | "CONTACTED" | "CLOSED",
-) {
+  nextStatus: CustomerRequestStatus,
+  _previousState: CustomerRequestActionState,
+): Promise<CustomerRequestActionState> {
   const session = await auth();
 
   if (!session?.user) {
-    throw new Error("Unauthorized");
+    return {
+      success: false,
+      message: "Session expirée. Reconnectez-vous.",
+    };
   }
 
-  await prisma.customerRequest.update({
+  const request = await prisma.customerRequest.findUnique({
     where: {
       id: requestId,
     },
 
-    data: {
-      status,
+    select: {
+      status: true,
     },
   });
 
+  if (!request) {
+    return {
+      success: false,
+      message: "Demande introuvable.",
+    };
+  }
+
+  if (!canTransitionCustomerRequestStatus(request.status, nextStatus)) {
+    return {
+      success: false,
+      message: "Cette transition de statut n'est pas autorisée.",
+    };
+  }
+
+  try {
+    await prisma.customerRequest.update({
+      where: {
+        id: requestId,
+      },
+
+      data: {
+        status: nextStatus,
+      },
+    });
+  } catch {
+    return {
+      success: false,
+      message: "Impossible de modifier le statut de la demande.",
+    };
+  }
+
   revalidatePath("/admin/requests");
+  revalidatePath(`/admin/requests/${requestId}`);
+  revalidatePath("/admin");
+
+  return {
+    success: true,
+    message: "Statut mis à jour.",
+  };
 }
 
 export async function updateCustomerRequestNotes(
