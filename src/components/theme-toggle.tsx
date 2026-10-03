@@ -37,17 +37,23 @@ function applyTheme(preference: ThemePreference) {
   root.dataset.themePreference = preference;
 }
 
+function getInitialPreference(): ThemePreference {
+  if (typeof window === "undefined") {
+    return "system";
+  }
+
+  const stored = localStorage.getItem(THEME_STORAGE_KEY);
+
+  return isThemePreference(stored) ? stored : "system";
+}
+
 export function ThemeToggle() {
-  const [preference, setPreference] = useState<ThemePreference>("system");
+  const [preference, setPreference] =
+    useState<ThemePreference>(getInitialPreference);
 
   useEffect(() => {
-    const stored = localStorage.getItem(THEME_STORAGE_KEY);
-
-    const initial = isThemePreference(stored) ? stored : "system";
-
-    setPreference(initial);
-    applyTheme(initial);
-  }, []);
+    applyTheme(preference);
+  }, [preference]);
 
   useEffect(() => {
     const media = window.matchMedia("(prefers-color-scheme: light)");
@@ -66,23 +72,34 @@ export function ThemeToggle() {
   }, [preference]);
 
   function setTheme(next: ThemePreference) {
-    setPreference(next);
-
     localStorage.setItem(THEME_STORAGE_KEY, next);
 
-    applyTheme(next);
+    setPreference(next);
   }
 
   return (
     <div
-      className="inline-flex items-center rounded-lg border border-(--border) bg-(--bg-2) p-1"
+      className="
+        inline-flex items-center
+        rounded-lg
+        border border-(--border)
+        bg-(--bg-2)
+        p-1
+      "
       aria-label="Choisir le thème"
     >
       <button
         type="button"
         onClick={() => setTheme("system")}
         aria-pressed={preference === "system"}
-        className="rounded-md px-2.5 py-1.5 text-xs text-(--muted) transition aria-pressed:bg-(--surface) aria-pressed:text-(--text)"
+        className="
+          rounded-md px-2.5 py-1.5
+          text-xs
+          text-(--muted)
+          transition
+          aria-pressed:bg-(--surface)
+          aria-pressed:text-(--text)
+        "
       >
         Auto
       </button>
@@ -91,7 +108,14 @@ export function ThemeToggle() {
         type="button"
         onClick={() => setTheme("light")}
         aria-pressed={preference === "light"}
-        className="rounded-md px-2.5 py-1.5 text-xs text-(--muted) transition aria-pressed:bg-(--surface) aria-pressed:text-(--text)"
+        className="
+          rounded-md px-2.5 py-1.5
+          text-xs
+          text-(--muted)
+          transition
+          aria-pressed:bg-(--surface)
+          aria-pressed:text-(--text)
+        "
       >
         ☀
       </button>
@@ -100,7 +124,14 @@ export function ThemeToggle() {
         type="button"
         onClick={() => setTheme("dark")}
         aria-pressed={preference === "dark"}
-        className="rounded-md px-2.5 py-1.5 text-xs text-(--muted) transition aria-pressed:bg-(--surface) aria-pressed:text-(--text)"
+        className="
+          rounded-md px-2.5 py-1.5
+          text-xs
+          text-(--muted)
+          transition
+          aria-pressed:bg-(--surface)
+          aria-pressed:text-(--text)
+        "
       >
         ☾
       </button>
