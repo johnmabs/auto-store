@@ -8,6 +8,7 @@ import {
   type CustomerRequestStatus,
 } from "./request-status";
 import { requireAdmin } from "../auth/require-admin";
+import { customerRequestStatusActionSchema } from "./request-status.schema";
 
 export type CustomerRequestActionState = {
   success: boolean;
@@ -110,6 +111,18 @@ export async function updateCustomerRequestStatus(
     return {
       success: false,
       message: "Votre session a expiré. Reconnectez-vous.",
+    };
+  }
+
+  const parsed = customerRequestStatusActionSchema.safeParse({
+    requestId,
+    status: nextStatus,
+  });
+
+  if (!parsed.success) {
+    return {
+      success: false,
+      message: "Paramètres invalides.",
     };
   }
 

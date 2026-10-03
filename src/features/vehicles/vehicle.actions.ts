@@ -16,6 +16,11 @@ import {
   requiresPublishedVehicle,
 } from "./vehicle-status";
 
+import {
+  vehicleImageActionSchema,
+  vehicleImageMoveActionSchema,
+} from "./vehicle-image.schema";
+
 export type VehicleFormState = {
   success: boolean;
   message?: string;
@@ -429,6 +434,18 @@ export async function removeVehicleImage(
     };
   }
 
+  const parsed = vehicleImageActionSchema.safeParse({
+    vehicleId,
+    imageId,
+  });
+
+  if (!parsed.success) {
+    return {
+      success: false,
+      message: "Paramètres invalides.",
+    };
+  }
+
   const image = await prisma.vehicleImage.findFirst({
     where: {
       id: imageId,
@@ -544,6 +561,18 @@ export async function setPrimaryVehicleImage(
     };
   }
 
+  const parsed = vehicleImageActionSchema.safeParse({
+    vehicleId,
+    imageId,
+  });
+
+  if (!parsed.success) {
+    return {
+      success: false,
+      message: "Paramètres invalides.",
+    };
+  }
+
   const image = await prisma.vehicleImage.findFirst({
     where: {
       id: imageId,
@@ -623,6 +652,19 @@ export async function moveVehicleImage(
     return {
       success: false,
       message: "Votre session a expiré. Reconnectez-vous.",
+    };
+  }
+
+  const parsed = vehicleImageMoveActionSchema.safeParse({
+    vehicleId,
+    imageId,
+    direction,
+  });
+
+  if (!parsed.success) {
+    return {
+      success: false,
+      message: "Paramètres invalides.",
     };
   }
 
