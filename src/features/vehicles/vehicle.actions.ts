@@ -26,6 +26,11 @@ export type VehicleImagesState = {
   message?: string;
 };
 
+export type VehicleImageActionState = {
+  success: boolean;
+  message?: string;
+};
+
 function slugify(value: string) {
   return value
     .toLowerCase()
@@ -382,7 +387,11 @@ export async function addVehicleImages(
   };
 }
 
-export async function removeVehicleImage(vehicleId: string, imageId: string) {
+export async function removeVehicleImage(
+  vehicleId: string,
+  imageId: string,
+  _previousState: VehicleImageActionState,
+): Promise<VehicleImageActionState> {
   const image = await prisma.vehicleImage.findFirst({
     where: {
       id: imageId,
@@ -400,7 +409,10 @@ export async function removeVehicleImage(vehicleId: string, imageId: string) {
   });
 
   if (!image) {
-    throw new Error("Image introuvable.");
+    return {
+      success: false,
+      message: "Image introuvable.",
+    };
   }
 
   const imageCount = await prisma.vehicleImage.count({
@@ -410,67 +422,82 @@ export async function removeVehicleImage(vehicleId: string, imageId: string) {
   });
 
   if (image.vehicle.status !== "DRAFT" && imageCount === 1) {
-    throw new Error(
-      "Impossible de supprimer la dernière image d'un véhicule publié.",
-    );
+    return {
+      success: false,
+      message:
+        "Impossible de supprimer la dernière image d'un véhicule publié.",
+    };
   }
 
-  await deleteVehicleImage(image.publicId);
+  try {
+    await deleteVehicleImage(image.publicId);
 
-  await prisma.$transaction(async (tx) => {
-    await tx.vehicleImage.delete({
-      where: {
-        id: image.id,
-      },
-    });
-
-    const remainingImages = await tx.vehicleImage.findMany({
-      where: {
-        vehicleId,
-      },
-
-      orderBy: {
-        position: "asc",
-      },
-
-      select: {
-        id: true,
-        isPrimary: true,
-      },
-    });
-
-    for (let position = 0; position < remainingImages.length; position++) {
-      await tx.vehicleImage.update({
+    await prisma.$transaction(async (tx) => {
+      await tx.vehicleImage.delete({
         where: {
-          id: remainingImages[position].id,
-        },
-
-        data: {
-          position,
+          id: image.id,
         },
       });
-    }
 
-    if (image.isPrimary && remainingImages.length > 0) {
-      await tx.vehicleImage.update({
+      const remainingImages = await tx.vehicleImage.findMany({
         where: {
-          id: remainingImages[0].id,
+          vehicleId,
         },
 
-        data: {
+        orderBy: {
+          position: "asc",
+        },
+
+        select: {
+          id: true,
           isPrimary: true,
         },
       });
-    }
-  });
+
+      for (let position = 0; position < remainingImages.length; position++) {
+        await tx.vehicleImage.update({
+          where: {
+            id: remainingImages[position].id,
+          },
+
+          data: {
+            position,
+          },
+        });
+      }
+
+      if (image.isPrimary && remainingImages.length > 0) {
+        await tx.vehicleImage.update({
+          where: {
+            id: remainingImages[0].id,
+          },
+
+          data: {
+            isPrimary: true,
+          },
+        });
+      }
+    });
+  } catch {
+    return {
+      success: false,
+      message: "Impossible de supprimer cette image.",
+    };
+  }
 
   revalidateVehiclePages(vehicleId, image.vehicle.slug);
+
+  return {
+    success: true,
+    message: "Image supprimée.",
+  };
 }
 
 export async function setPrimaryVehicleImage(
   vehicleId: string,
   imageId: string,
-) {
+  _previousState: VehicleImageActionState,
+): Promise<VehicleImageActionState> {
   const image = await prisma.vehicleImage.findFirst({
     where: {
       id: imageId,
@@ -487,10 +514,20 @@ export async function setPrimaryVehicleImage(
   });
 
   if (!image) {
-    throw new Error("Image introuvable.");
+    return {
+      success: false,
+      message: "Image introuvable.",
+    };
   }
 
-  if (!image.isPrimary) {
+  if (image.isPrimary) {
+    return {
+      success: true,
+      message: "Cette image est déjà l'image principale.",
+    };
+  }
+
+  try {
     await prisma.$transaction([
       prisma.vehicleImage.updateMany({
         where: {
@@ -513,16 +550,27 @@ export async function setPrimaryVehicleImage(
         },
       }),
     ]);
+  } catch {
+    return {
+      success: false,
+      message: "Impossible de modifier l'image principale.",
+    };
   }
 
   revalidateVehiclePages(vehicleId, image.vehicle.slug);
+
+  return {
+    success: true,
+    message: "Image principale mise à jour.",
+  };
 }
 
 export async function moveVehicleImage(
   vehicleId: string,
   imageId: string,
   direction: "up" | "down",
-) {
+  _previousState: VehicleImageActionState,
+): Promise<VehicleImageActionState> {
   const images = await prisma.vehicleImage.findMany({
     where: {
       vehicleId,
@@ -544,39 +592,57 @@ export async function moveVehicleImage(
   const currentIndex = images.findIndex((image) => image.id === imageId);
 
   if (currentIndex === -1) {
-    throw new Error("Image introuvable.");
+    return {
+      success: false,
+      message: "Image introuvable.",
+    };
   }
 
   const targetIndex = direction === "up" ? currentIndex - 1 : currentIndex + 1;
 
   if (targetIndex < 0 || targetIndex >= images.length) {
-    return;
+    return {
+      success: false,
+      message: "Déplacement impossible.",
+    };
   }
 
   const currentImage = images[currentIndex];
   const targetImage = images[targetIndex];
 
-  await prisma.$transaction([
-    prisma.vehicleImage.update({
-      where: {
-        id: currentImage.id,
-      },
+  try {
+    await prisma.$transaction([
+      prisma.vehicleImage.update({
+        where: {
+          id: currentImage.id,
+        },
 
-      data: {
-        position: targetImage.position,
-      },
-    }),
+        data: {
+          position: targetImage.position,
+        },
+      }),
 
-    prisma.vehicleImage.update({
-      where: {
-        id: targetImage.id,
-      },
+      prisma.vehicleImage.update({
+        where: {
+          id: targetImage.id,
+        },
 
-      data: {
-        position: currentImage.position,
-      },
-    }),
-  ]);
+        data: {
+          position: currentImage.position,
+        },
+      }),
+    ]);
+  } catch {
+    return {
+      success: false,
+      message: "Impossible de réordonner les images.",
+    };
+  }
 
   revalidateVehiclePages(vehicleId, currentImage.vehicle.slug);
+
+  return {
+    success: true,
+    message: "Ordre des images mis à jour.",
+  };
 }

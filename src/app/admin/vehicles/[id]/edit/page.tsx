@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
 
+import { VehicleImageActions } from "@/features/vehicles/vehicle-image-actions";
 import { VehicleImagesUploadForm } from "@/features/vehicles/vehicle-images-upload-form";
 
 import { getAdminVehicleById } from "@/features/vehicles/vehicle.queries";
@@ -72,69 +73,13 @@ export default async function EditVehiclePage({
               </div>
 
               <div className="space-y-3 p-3">
-                {!image.isPrimary && (
-                  <form
-                    action={setPrimaryVehicleImage.bind(
-                      null,
-                      vehicle.id,
-                      image.id,
-                    )}
-                  >
-                    <button
-                      type="submit"
-                      className="text-sm underline underline-offset-4"
-                    >
-                      Définir comme principale
-                    </button>
-                  </form>
-                )}
-
-                <div className="flex gap-2">
-                  <form
-                    action={moveVehicleImage.bind(
-                      null,
-                      vehicle.id,
-                      image.id,
-                      "up",
-                    )}
-                  >
-                    <button
-                      type="submit"
-                      disabled={index === 0}
-                      className="rounded border px-3 py-1 text-sm disabled:opacity-30"
-                    >
-                      ←
-                    </button>
-                  </form>
-
-                  <form
-                    action={moveVehicleImage.bind(
-                      null,
-                      vehicle.id,
-                      image.id,
-                      "down",
-                    )}
-                  >
-                    <button
-                      type="submit"
-                      disabled={index === vehicle.images.length - 1}
-                      className="rounded border px-3 py-1 text-sm disabled:opacity-30"
-                    >
-                      →
-                    </button>
-                  </form>
-
-                  <form
-                    action={removeVehicleImage.bind(null, vehicle.id, image.id)}
-                  >
-                    <button
-                      type="submit"
-                      className="rounded border border-red-200 px-3 py-1 text-sm text-red-700"
-                    >
-                      Supprimer
-                    </button>
-                  </form>
-                </div>
+                <VehicleImageActions
+                  vehicleId={vehicle.id}
+                  imageId={image.id}
+                  isPrimary={image.isPrimary}
+                  isFirst={index === 0}
+                  isLast={index === vehicle.images.length - 1}
+                />
               </div>
             </div>
           ))}
