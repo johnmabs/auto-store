@@ -5,12 +5,18 @@ export function HeroSection() {
     <section className="relative isolate overflow-hidden bg-(--bg)">
       <div
         aria-hidden="true"
-        className="absolute inset-0 -z-20 bg-[radial-gradient(circle_at_70%_45%,rgba(201,168,76,0.12),transparent_35%),linear-gradient(135deg,#0a0a0b_0%,#111114_55%,#0a0a0b_100%)]"
+        className="absolute inset-0 -z-20"
+        style={{
+          background: "var(--hero-bg)",
+        }}
       />
 
       <div
         aria-hidden="true"
-        className="absolute inset-x-0 top-0 -z-10 h-px bg-linear-to-r from-transparent via-gold-500/40 to-transparent"
+        className="absolute inset-x-0 top-0 -z-10 h-px"
+        style={{
+          background: "var(--hero-glow)",
+        }}
       />
 
       <div className="mx-auto grid min-h-180 max-w-7xl items-center gap-16 px-6 py-20 lg:grid-cols-[1.1fr_0.9fr] lg:py-24">
@@ -51,7 +57,7 @@ export function HeroSection() {
 
             <Link
               href="/vehicles?location=IN_CONGO"
-              className="inline-flex items-center rounded-xl border border-(--border) bg-(--bg) px-6 py-3.5 text-sm font-semibold text-(--text) transition hover:border-gold-500/40 hover:bg-(--bg)/50"
+              className="inline-flex items-center rounded-xl border border-(--border) bg-(--surface) px-6 py-3.5 text-sm font-semibold text-(--text) transition hover:border-gold-500/40 hover:bg-(--bg-3)"
             >
               Disponibles au Congo
             </Link>
@@ -60,7 +66,7 @@ export function HeroSection() {
           <form
             action="/vehicles"
             method="get"
-            className="mt-10 flex max-w-xl overflow-hidden rounded-xl border border-(--border) bg-(--bg)"
+            className="mt-10 flex max-w-xl overflow-hidden rounded-xl border border-(--border) bg-(--surface)"
           >
             <label htmlFor="hero-search" className="sr-only">
               Rechercher un véhicule
@@ -107,9 +113,14 @@ export function HeroSection() {
         </div>
 
         <div className="relative hidden min-h-130 lg:block">
-          <div className="absolute inset-8 rounded-[3rem] border border-gold-500/10 bg-linear-to-br from-gold-500/10 via-transparent to-transparent" />
+          <div
+            className="absolute inset-8 rounded-[3rem] border border-gold-500/10"
+            style={{
+              background: "var(--hero-panel)",
+            }}
+          />
 
-          <div className="absolute left-8 top-14 w-[80%] rounded-3xl border border-(--border) bg-(--bg) p-7 shadow-2xl backdrop-blur">
+          <div className="absolute left-8 top-14 w-[80%] rounded-3xl border border-(--border) bg-(--surface)/90 p-7 shadow-2xl backdrop-blur">
             <p className="text-xs uppercase tracking-[0.2em] text-gold-500">
               Auto Store
             </p>

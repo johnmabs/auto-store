@@ -48,6 +48,18 @@
   --warning: #f39c12;
   --info: #3498db;
   --danger: #e74c3c;
+
+  --hero-bg:
+    radial-gradient(circle at 70% 45%, rgb(201 168 76 / 12%), transparent 35%),
+    linear-gradient(135deg, #0a0a0b 0%, #111114 55%, #0a0a0b 100%);
+
+  --hero-glow: radial-gradient(
+    circle,
+    rgb(201 168 76 / 10%) 0%,
+    transparent 70%
+  );
+
+  --hero-panel: linear-gradient(135deg, rgb(201 168 76 / 12%), transparent 65%);
 }
 
 :root.light {
@@ -78,6 +90,23 @@
   --warning: #d68910;
   --info: #1a7dc4;
   --danger: #c0392b;
+
+  --hero-bg:
+    radial-gradient(circle at 70% 45%, rgb(176 138 47 / 13%), transparent 35%),
+    linear-gradient(135deg, #fafaf8 0%, #f2f0eb 55%, #fafaf8 100%);
+
+  --hero-glow: radial-gradient(
+    circle,
+    rgb(176 138 47 / 11%) 0%,
+    transparent 70%
+  );
+
+  --hero-panel: linear-gradient(
+    135deg,
+    rgb(176 138 47 / 10%),
+    rgb(255 255 255 / 45%) 55%,
+    transparent 100%
+  );
 }
 
 body {
