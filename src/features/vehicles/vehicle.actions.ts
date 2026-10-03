@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 
+import { requireAdmin } from "@/features/auth/require-admin";
 import { prisma } from "@/lib/prisma";
 import { vehicleFormSchema } from "./vehicle-form.schema";
 import {
@@ -51,6 +52,15 @@ export async function createVehicle(
   _previousState: VehicleFormState,
   formData: FormData,
 ): Promise<VehicleFormState> {
+  const user = await requireAdmin();
+
+  if (!user) {
+    return {
+      success: false,
+      message: "Votre session a expiré. Reconnectez-vous.",
+    };
+  }
+
   const parsed = vehicleFormSchema.safeParse({
     make: formData.get("make"),
     model: formData.get("model"),
@@ -146,6 +156,15 @@ export async function updateVehicle(
   _previousState: VehicleFormState,
   formData: FormData,
 ): Promise<VehicleFormState> {
+  const user = await requireAdmin();
+
+  if (!user) {
+    return {
+      success: false,
+      message: "Votre session a expiré. Reconnectez-vous.",
+    };
+  }
+
   const parsed = vehicleFormSchema.safeParse({
     make: formData.get("make"),
     model: formData.get("model"),
@@ -278,6 +297,15 @@ export async function addVehicleImages(
   _previousState: VehicleImagesState,
   formData: FormData,
 ): Promise<VehicleImagesState> {
+  const user = await requireAdmin();
+
+  if (!user) {
+    return {
+      success: false,
+      message: "Votre session a expiré. Reconnectez-vous.",
+    };
+  }
+
   const files = formData
     .getAll("images")
     .filter((value): value is File => value instanceof File && value.size > 0);
@@ -392,6 +420,15 @@ export async function removeVehicleImage(
   imageId: string,
   _previousState: VehicleImageActionState,
 ): Promise<VehicleImageActionState> {
+  const user = await requireAdmin();
+
+  if (!user) {
+    return {
+      success: false,
+      message: "Votre session a expiré. Reconnectez-vous.",
+    };
+  }
+
   const image = await prisma.vehicleImage.findFirst({
     where: {
       id: imageId,
@@ -498,6 +535,15 @@ export async function setPrimaryVehicleImage(
   imageId: string,
   _previousState: VehicleImageActionState,
 ): Promise<VehicleImageActionState> {
+  const user = await requireAdmin();
+
+  if (!user) {
+    return {
+      success: false,
+      message: "Votre session a expiré. Reconnectez-vous.",
+    };
+  }
+
   const image = await prisma.vehicleImage.findFirst({
     where: {
       id: imageId,
@@ -571,6 +617,15 @@ export async function moveVehicleImage(
   direction: "up" | "down",
   _previousState: VehicleImageActionState,
 ): Promise<VehicleImageActionState> {
+  const user = await requireAdmin();
+
+  if (!user) {
+    return {
+      success: false,
+      message: "Votre session a expiré. Reconnectez-vous.",
+    };
+  }
+
   const images = await prisma.vehicleImage.findMany({
     where: {
       vehicleId,

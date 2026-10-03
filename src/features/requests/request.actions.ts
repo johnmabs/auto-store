@@ -1,6 +1,5 @@
 "use server";
 
-import { auth } from "@/auth";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { customerRequestSchema } from "./request.schema";
@@ -8,6 +7,7 @@ import {
   canTransitionCustomerRequestStatus,
   type CustomerRequestStatus,
 } from "./request-status";
+import { requireAdmin } from "../auth/require-admin";
 
 export type CustomerRequestActionState = {
   success: boolean;
@@ -104,12 +104,12 @@ export async function updateCustomerRequestStatus(
   nextStatus: CustomerRequestStatus,
   _previousState: CustomerRequestActionState,
 ): Promise<CustomerRequestActionState> {
-  const session = await auth();
+  const user = await requireAdmin();
 
-  if (!session?.user) {
+  if (!user) {
     return {
       success: false,
-      message: "Session expirée. Reconnectez-vous.",
+      message: "Votre session a expiré. Reconnectez-vous.",
     };
   }
 
@@ -166,30 +166,50 @@ export async function updateCustomerRequestStatus(
 
 export async function updateCustomerRequestNotes(
   requestId: string,
+  _previousState: CustomerRequestActionState,
   formData: FormData,
-) {
-  const session = await auth();
+): Promise<CustomerRequestActionState> {
+  const user = await requireAdmin();
 
-  if (!session?.user) {
-    throw new Error("Unauthorized");
+  if (!user) {
+    return {
+      success: false,
+      message: "Votre session a expiré. Reconnectez-vous.",
+    };
   }
 
   const adminNotes = formData.get("adminNotes");
 
-  await prisma.customerRequest.update({
-    where: {
-      id: requestId,
-    },
+  if (adminNotes !== null && typeof adminNotes !== "string") {
+    return {
+      success: false,
+      message: "Notes invalides.",
+    };
+  }
 
-    data: {
-      adminNotes:
-        typeof adminNotes === "string" && adminNotes.trim().length > 0
-          ? adminNotes.trim()
-          : null,
-    },
-  });
+  try {
+    await prisma.customerRequest.update({
+      where: {
+        id: requestId,
+      },
+
+      data: {
+        adminNotes: adminNotes?.trim() ? adminNotes.trim() : null,
+      },
+    });
+  } catch {
+    return {
+      success: false,
+      message: "Impossible d'enregistrer les notes.",
+    };
+  }
 
   revalidatePath(`/admin/requests/${requestId}`);
 
   revalidatePath("/admin/requests");
+
+  return {
+    success: true,
+    message: "Notes enregistrées.",
+  };
 }

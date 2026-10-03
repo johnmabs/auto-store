@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { updateCustomerRequestNotes } from "@/features/requests/request.actions";
 import { getAdminCustomerRequestById } from "@/features/requests/request.queries";
 import { getCustomerRequestStatusLabel } from "@/features/requests/request.formatters";
 import { getVehicleLocationLabel } from "@/features/vehicles/vehicle.formatters";
 import { RequestStatusActions } from "@/features/requests/request-status-actions";
+
+import { RequestNotesForm } from "@/features/requests/request-notes-form";
 
 type AdminRequestPageProps = {
   params: Promise<{
@@ -175,34 +176,10 @@ export default async function AdminRequestPage({
             </div>
           </div>
 
-          <form
-            action={updateCustomerRequestNotes.bind(null, request.id)}
-            className="rounded-xl border bg-white p-6"
-          >
-            <label htmlFor="adminNotes" className="font-semibold">
-              Notes internes
-            </label>
-
-            <p className="mt-1 text-xs text-neutral-500">
-              Ces notes ne sont jamais visibles par le client.
-            </p>
-
-            <textarea
-              id="adminNotes"
-              name="adminNotes"
-              rows={6}
-              defaultValue={request.adminNotes ?? ""}
-              className="mt-4 w-full rounded-lg border px-3 py-2"
-              placeholder="Ex. Client appelé, souhaite visiter le véhicule samedi..."
-            />
-
-            <button
-              type="submit"
-              className="mt-3 rounded-lg bg-black px-4 py-2 text-sm text-white"
-            >
-              Enregistrer les notes
-            </button>
-          </form>
+          <RequestNotesForm
+            requestId={request.id}
+            initialNotes={request.adminNotes}
+          />
         </div>
       </div>
     </section>
