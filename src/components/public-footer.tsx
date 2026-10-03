@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export function PublicFooter() {
   return (
-    <footer className="border-t bg-neutral-950 text-neutral-300">
+    <footer className="border-t border-dark-800 bg-dark-950 text-dark-300">
       <div className="mx-auto grid max-w-7xl gap-8 px-6 py-12 md:grid-cols-3">
         <div>
           <p className="text-lg font-semibold text-white">Auto Store</p>

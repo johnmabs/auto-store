@@ -1,6 +1,8 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 
+import { HeroSection } from "@/features/home/hero-section";
+
 import { VehicleCard } from "@/features/vehicles/vehicle-card";
 import { getFeaturedVehicles } from "@/features/vehicles/vehicle.queries";
 
@@ -16,81 +18,49 @@ export default async function HomePage() {
 
   return (
     <main>
-      <section className="bg-neutral-950 text-white">
-        <div className="mx-auto max-w-7xl px-6 py-24">
-          <div className="max-w-3xl">
-            <p className="text-sm font-medium uppercase tracking-[0.2em] text-neutral-400">
-              Auto Store
-            </p>
+      <HeroSection />
 
-            <h1 className="mt-4 text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
-              Votre prochain véhicule, au Congo ou à l&apos;importation.
-            </h1>
+      <section className="bg-dark-950 px-6 py-24">
+        <section className="mx-auto max-w-7xl px-6 py-16">
+          <div className="flex items-end justify-between gap-6">
+            <div>
+              <h2 className="text-3xl font-bold">Véhicules en vedette</h2>
 
-            <p className="mt-6 max-w-2xl text-lg text-neutral-300">
-              Découvrez une sélection de véhicules d&apos;occasion disponibles
-              localement, en transit ou directement depuis nos marchés
-              partenaires à l&apos;étranger.
-            </p>
-
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link
-                href="/vehicles"
-                className="rounded-lg bg-white px-5 py-3 font-medium text-black"
-              >
-                Voir les véhicules
-              </Link>
-
-              <Link
-                href="/vehicles?location=IN_CONGO"
-                className="rounded-lg border border-neutral-700 px-5 py-3 font-medium"
-              >
-                Disponibles au Congo
-              </Link>
+              <p className="mt-2 text-neutral-600">
+                Une sélection de véhicules actuellement disponibles.
+              </p>
             </div>
-          </div>
-        </div>
-      </section>
 
-      <section className="mx-auto max-w-7xl px-6 py-16">
-        <div className="flex items-end justify-between gap-6">
-          <div>
-            <h2 className="text-3xl font-bold">Véhicules en vedette</h2>
-
-            <p className="mt-2 text-neutral-600">
-              Une sélection de véhicules actuellement disponibles.
-            </p>
+            <Link
+              href="/vehicles"
+              className="hidden text-sm underline underline-offset-4 sm:block"
+            >
+              Voir tout le catalogue
+            </Link>
           </div>
 
-          <Link
-            href="/vehicles"
-            className="hidden text-sm underline underline-offset-4 sm:block"
-          >
-            Voir tout le catalogue
-          </Link>
-        </div>
+          {featuredVehicles.length === 0 ? (
+            <div className="mt-8 rounded-xl border p-8 text-center text-neutral-500">
+              Aucun véhicule mis en avant pour le moment.
+            </div>
+          ) : (
+            <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {featuredVehicles.map((vehicle, index) => (
+                <VehicleCard
+                  key={vehicle.id}
+                  vehicle={vehicle}
+                  priority={index === 0}
+                />
+              ))}
+            </div>
+          )}
 
-        {featuredVehicles.length === 0 ? (
-          <div className="mt-8 rounded-xl border p-8 text-center text-neutral-500">
-            Aucun véhicule mis en avant pour le moment.
+          <div className="mt-8 sm:hidden">
+            <Link href="/vehicles" className="underline underline-offset-4">
+              Voir tout le catalogue
+            </Link>
           </div>
-        ) : (
-          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {featuredVehicles.map((vehicle, index) => (
-              <VehicleCard
-                key={vehicle.id}
-                vehicle={vehicle}
-                priority={index === 0}
-              />
-            ))}
-          </div>
-        )}
-
-        <div className="mt-8 sm:hidden">
-          <Link href="/vehicles" className="underline underline-offset-4">
-            Voir tout le catalogue
-          </Link>
-        </div>
+        </section>
       </section>
 
       <section className="border-y bg-neutral-50">

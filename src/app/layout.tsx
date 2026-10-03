@@ -1,6 +1,23 @@
 import type { Metadata } from "next";
+import { Bebas_Neue, DM_Sans, Playfair_Display } from "next/font/google";
 
 import "./globals.css";
+
+const dmSans = DM_Sans({
+  subsets: ["latin"],
+  variable: "--font-dm-sans",
+});
+
+const bebasNeue = Bebas_Neue({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-bebas-neue",
+});
+
+const playfairDisplay = Playfair_Display({
+  subsets: ["latin"],
+  variable: "--font-playfair-display",
+});
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
@@ -23,7 +40,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr">
-      <body>{children}</body>
+      <body
+        className={`${dmSans.variable} ${bebasNeue.variable} ${playfairDisplay.variable} bg-dark-950 text-white`}
+      >
+        {children}
+      </body>
     </html>
   );
 }
