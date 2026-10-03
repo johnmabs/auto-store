@@ -62,6 +62,10 @@ export const vehicleFormSchema = z
       path: ["congoCity"],
       message: "La ville est obligatoire pour un véhicule au Congo.",
     },
-  );
+  )
+  .refine((data) => data.locationStatus === "IN_CONGO" || !data.congoCity, {
+    path: ["congoCity"],
+    message: "La ville ne doit être renseignée que pour un véhicule au Congo.",
+  });
 
 export type VehicleFormInput = z.infer<typeof vehicleFormSchema>;
