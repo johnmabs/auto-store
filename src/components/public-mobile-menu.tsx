@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { ThemeToggle } from "./theme-toggle";
 
 export function PublicMobileMenu() {
   const [open, setOpen] = useState(false);
@@ -40,6 +41,8 @@ export function PublicMobileMenu() {
               </Link>
             ))}
           </nav>
+
+          <ThemeToggle />
         </div>
       )}
     </div>

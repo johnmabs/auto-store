@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export function HeroSection() {
   return (
-    <section className="relative isolate overflow-hidden bg-dark-950">
+    <section className="relative isolate overflow-hidden bg-(--bg)">
       <div
         aria-hidden="true"
         className="absolute inset-0 -z-20 bg-[radial-gradient(circle_at_70%_45%,rgba(201,168,76,0.12),transparent_35%),linear-gradient(135deg,#0a0a0b_0%,#111114_55%,#0a0a0b_100%)]"

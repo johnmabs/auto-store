@@ -1,14 +1,16 @@
 @import "tailwindcss";
 
 @theme {
+  --color-gold-50: #fdf9ee;
+  --color-gold-100: #faf0d0;
+  --color-gold-200: #f5e0a2;
+  --color-gold-300: #eec96c;
   --color-gold-400: #e6b23e;
   --color-gold-500: #c9a84c;
   --color-gold-600: #b08a2f;
-
-  --color-dark-800: #2a2a32;
-  --color-dark-900: #1a1a1f;
-  --color-dark-925: #111114;
-  --color-dark-950: #0a0a0b;
+  --color-gold-700: #8f6b23;
+  --color-gold-800: #6e4f1e;
+  --color-gold-900: #4e3516;
 
   --color-accent-500: #e63946;
 
@@ -17,18 +19,118 @@
   --font-serif: var(--font-playfair-display);
 }
 
+/* DARK = thème par défaut */
 :root {
   color-scheme: dark;
 
   --bg: #0a0a0b;
   --bg-2: #111114;
   --bg-3: #1a1a1f;
+  --bg-4: #222228;
 
-  --gold: #c9a84c;
-  --gold-light: #e8c97a;
+  --surface: #111114;
+  --surface-elevated: #1a1a1f;
 
   --text: #f8f6f2;
   --muted: #8a8891;
+  --dim: #5a5866;
 
   --border: #2a2a32;
+  --border-2: #3a3a46;
+
+  --gold: #c9a84c;
+  --gold-2: #e8c97a;
+  --gold-3: #f5e0a8;
+
+  --accent: #e63946;
+
+  --success: #2ecc71;
+  --warning: #f39c12;
+  --info: #3498db;
+  --danger: #e74c3c;
+
+  --r: 8px;
+  --r-lg: 14px;
+  --r-xl: 20px;
+
+  --nav-h: 72px;
+}
+
+/* LIGHT */
+:root.light {
+  color-scheme: light;
+
+  --bg: #fafaf8;
+  --bg-2: #f2f0eb;
+  --bg-3: #e8e5de;
+  --bg-4: #dedad1;
+
+  --surface: #ffffff;
+  --surface-elevated: #f2f0eb;
+
+  --text: #1a1a1f;
+  --muted: #5a5866;
+  --dim: #8a8891;
+
+  --border: #dedad1;
+  --border-2: #ccc9bf;
+
+  --gold: #b08a2f;
+  --gold-2: #c9a84c;
+  --gold-3: #8f6b23;
+
+  --accent: #d32130;
+
+  --success: #1a9e55;
+  --warning: #d68910;
+  --info: #1a7dc4;
+  --danger: #c0392b;
+}
+
+body {
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  line-height: 1.05;
+}
+
+::selection {
+  background: rgb(201 168 76 / 30%);
+  color: var(--text);
+}
+
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-2);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-2);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gold);
 }
