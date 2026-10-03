@@ -38,6 +38,78 @@ export type VehicleFilters = {
   page?: number;
 };
 
+function buildVehicleWhere(filters: VehicleFilters) {
+  return {
+    status: filters.status ?? "AVAILABLE",
+
+    ...(filters.make && {
+      make: {
+        equals: filters.make,
+        mode: "insensitive" as const,
+      },
+    }),
+
+    ...(filters.location && {
+      locationStatus: filters.location,
+    }),
+
+    ...(filters.fuelType && {
+      fuelType: filters.fuelType,
+    }),
+
+    ...(filters.bodyType && {
+      bodyType: filters.bodyType,
+    }),
+
+    ...((filters.minYear !== undefined || filters.maxYear !== undefined) && {
+      year: {
+        ...(filters.minYear !== undefined && {
+          gte: filters.minYear,
+        }),
+
+        ...(filters.maxYear !== undefined && {
+          lte: filters.maxYear,
+        }),
+      },
+    }),
+
+    ...((filters.minPrice !== undefined || filters.maxPrice !== undefined) && {
+      price: {
+        ...(filters.minPrice !== undefined && {
+          gte: filters.minPrice,
+        }),
+
+        ...(filters.maxPrice !== undefined && {
+          lte: filters.maxPrice,
+        }),
+      },
+    }),
+
+    ...(filters.search && {
+      OR: [
+        {
+          make: {
+            contains: filters.search,
+            mode: "insensitive" as const,
+          },
+        },
+        {
+          model: {
+            contains: filters.search,
+            mode: "insensitive" as const,
+          },
+        },
+        {
+          variant: {
+            contains: filters.search,
+            mode: "insensitive" as const,
+          },
+        },
+      ],
+    }),
+  };
+}
+
 export type VehicleSort = "recent" | "price_asc" | "price_desc" | "year_desc";
 
 export async function getVehicles(filters: VehicleFilters = {}) {
@@ -271,74 +343,21 @@ export async function getAdminVehicleById(id: string) {
   });
 }
 
-function buildVehicleWhere(filters: VehicleFilters) {
-  return {
-    status: filters.status ?? "AVAILABLE",
-
-    ...(filters.make && {
-      make: {
-        equals: filters.make,
-        mode: "insensitive" as const,
+export async function getSitemapVehicles() {
+  return prisma.vehicle.findMany({
+    where: {
+      status: {
+        in: ["AVAILABLE", "RESERVED", "SOLD"],
       },
-    }),
+    },
 
-    ...(filters.location && {
-      locationStatus: filters.location,
-    }),
+    select: {
+      slug: true,
+      updatedAt: true,
+    },
 
-    ...(filters.fuelType && {
-      fuelType: filters.fuelType,
-    }),
-
-    ...(filters.bodyType && {
-      bodyType: filters.bodyType,
-    }),
-
-    ...((filters.minYear !== undefined || filters.maxYear !== undefined) && {
-      year: {
-        ...(filters.minYear !== undefined && {
-          gte: filters.minYear,
-        }),
-
-        ...(filters.maxYear !== undefined && {
-          lte: filters.maxYear,
-        }),
-      },
-    }),
-
-    ...((filters.minPrice !== undefined || filters.maxPrice !== undefined) && {
-      price: {
-        ...(filters.minPrice !== undefined && {
-          gte: filters.minPrice,
-        }),
-
-        ...(filters.maxPrice !== undefined && {
-          lte: filters.maxPrice,
-        }),
-      },
-    }),
-
-    ...(filters.search && {
-      OR: [
-        {
-          make: {
-            contains: filters.search,
-            mode: "insensitive" as const,
-          },
-        },
-        {
-          model: {
-            contains: filters.search,
-            mode: "insensitive" as const,
-          },
-        },
-        {
-          variant: {
-            contains: filters.search,
-            mode: "insensitive" as const,
-          },
-        },
-      ],
-    }),
-  };
+    orderBy: {
+      updatedAt: "desc",
+    },
+  });
 }
