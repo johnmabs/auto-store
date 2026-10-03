@@ -6,11 +6,6 @@ import { VehicleImagesUploadForm } from "@/features/vehicles/vehicle-images-uplo
 
 import { getAdminVehicleById } from "@/features/vehicles/vehicle.queries";
 import { EditVehicleForm } from "@/features/vehicles/edit-vehicle-form";
-import {
-  moveVehicleImage,
-  removeVehicleImage,
-  setPrimaryVehicleImage,
-} from "@/features/vehicles/vehicle.actions";
 
 type EditVehiclePageProps = {
   params: Promise<{
