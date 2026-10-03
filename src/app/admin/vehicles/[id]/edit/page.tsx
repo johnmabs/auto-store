@@ -1,10 +1,11 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
 
+import { VehicleImagesUploadForm } from "@/features/vehicles/vehicle-images-upload-form";
+
 import { getAdminVehicleById } from "@/features/vehicles/vehicle.queries";
 import { EditVehicleForm } from "@/features/vehicles/edit-vehicle-form";
 import {
-  addVehicleImages,
   moveVehicleImage,
   removeVehicleImage,
   setPrimaryVehicleImage,
@@ -145,35 +146,7 @@ export default async function EditVehiclePage({
           </div>
         )}
 
-        <form
-          action={addVehicleImages.bind(null, vehicle.id)}
-          className="mt-6 rounded-xl border bg-white p-6"
-        >
-          <label htmlFor="images" className="block text-sm font-medium">
-            Ajouter des images
-          </label>
-
-          <input
-            id="images"
-            name="images"
-            type="file"
-            accept="image/jpeg,image/png,image/webp"
-            multiple
-            required
-            className="mt-2 block w-full text-sm"
-          />
-
-          <p className="mt-2 text-xs text-neutral-500">
-            JPEG, PNG ou WebP. Maximum 10 Mo.
-          </p>
-
-          <button
-            type="submit"
-            className="mt-4 rounded-lg bg-black px-4 py-2 text-sm text-white"
-          >
-            Envoyer les images
-          </button>
-        </form>
+        <VehicleImagesUploadForm vehicleId={vehicle.id} />
       </div>
     </section>
   );

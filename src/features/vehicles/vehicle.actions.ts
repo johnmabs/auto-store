@@ -21,6 +21,11 @@ export type VehicleFormState = {
   errors?: Record<string, string[]>;
 };
 
+export type VehicleImagesState = {
+  success: boolean;
+  message?: string;
+};
+
 function slugify(value: string) {
   return value
     .toLowerCase()
@@ -263,17 +268,27 @@ export async function updateVehicle(
   redirect("/admin/vehicles");
 }
 
-export async function addVehicleImages(vehicleId: string, formData: FormData) {
+export async function addVehicleImages(
+  vehicleId: string,
+  _previousState: VehicleImagesState,
+  formData: FormData,
+): Promise<VehicleImagesState> {
   const files = formData
     .getAll("images")
     .filter((value): value is File => value instanceof File && value.size > 0);
 
   if (files.length === 0) {
-    throw new Error("Aucune image sélectionnée.");
+    return {
+      success: false,
+      message: "Sélectionnez au moins une image.",
+    };
   }
 
   if (files.length > 10) {
-    throw new Error("Vous pouvez envoyer au maximum 10 images à la fois.");
+    return {
+      success: false,
+      message: "Vous pouvez envoyer au maximum 10 images à la fois.",
+    };
   }
 
   const vehicle = await prisma.vehicle.findUnique({
@@ -294,10 +309,11 @@ export async function addVehicleImages(vehicleId: string, formData: FormData) {
   });
 
   if (!vehicle) {
-    throw new Error("Véhicule introuvable.");
+    return {
+      success: false,
+      message: "Véhicule introuvable.",
+    };
   }
-
-  const startPosition = vehicle._count.images;
 
   const uploadedImages: {
     publicId: string;
@@ -317,6 +333,8 @@ export async function addVehicleImages(vehicleId: string, formData: FormData) {
         height: upload.height,
       });
     }
+
+    const startPosition = vehicle._count.images;
 
     await prisma.vehicleImage.createMany({
       data: uploadedImages.map((image, index) => ({
@@ -340,10 +358,28 @@ export async function addVehicleImages(vehicleId: string, formData: FormData) {
       uploadedImages.map((image) => deleteVehicleImage(image.publicId)),
     );
 
-    throw error;
+    if (error instanceof Error) {
+      return {
+        success: false,
+        message: error.message,
+      };
+    }
+
+    return {
+      success: false,
+      message: "Impossible d'envoyer les images.",
+    };
   }
 
   revalidateVehiclePages(vehicle.id, vehicle.slug);
+
+  return {
+    success: true,
+    message:
+      files.length === 1
+        ? "Image ajoutée avec succès."
+        : `${files.length} images ajoutées avec succès.`,
+  };
 }
 
 export async function removeVehicleImage(vehicleId: string, imageId: string) {

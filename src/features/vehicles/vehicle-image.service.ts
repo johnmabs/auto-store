@@ -11,11 +11,11 @@ export async function uploadVehicleImage(
   vehicleId: string,
 ): Promise<UploadApiResponse> {
   if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
-    throw new Error("Format invalide. Utilisez JPEG, PNG ou WebP.");
+    throw new Error(`${file.name} : format non supporté.`);
   }
 
   if (file.size > MAX_IMAGE_SIZE) {
-    throw new Error("L'image ne doit pas dépasser 10 Mo.");
+    throw new Error(`${file.name} dépasse la taille maximale de 10 Mo.`);
   }
 
   const arrayBuffer = await file.arrayBuffer();
