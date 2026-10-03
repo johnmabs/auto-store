@@ -3,9 +3,14 @@ import Link from "next/link";
 import { updateCustomerRequestStatus } from "@/features/requests/request.actions";
 import { getAdminCustomerRequests } from "@/features/requests/request.queries";
 import { getCustomerRequestStatusLabel } from "@/features/requests/request.formatters";
+import { notFound } from "next/navigation";
 
 export default async function AdminRequestsPage() {
   const requests = await getAdminCustomerRequests();
+
+  if (!requests) {
+    notFound();
+  }
 
   return (
     <section>
