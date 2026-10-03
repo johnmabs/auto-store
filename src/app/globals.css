@@ -19,8 +19,8 @@
   --font-serif: var(--font-playfair-display);
 }
 
-/* DARK = thème par défaut */
-:root {
+:root,
+:root.dark {
   color-scheme: dark;
 
   --bg: #0a0a0b;
@@ -48,15 +48,8 @@
   --warning: #f39c12;
   --info: #3498db;
   --danger: #e74c3c;
-
-  --r: 8px;
-  --r-lg: 14px;
-  --r-xl: 20px;
-
-  --nav-h: 72px;
 }
 
-/* LIGHT */
 :root.light {
   color-scheme: light;
 

@@ -9,7 +9,7 @@ export function PublicHeader() {
       <div className="mx-auto flex h-18 max-w-7xl items-center justify-between px-6">
         <Link
           href="/"
-          className="font-display text-2xl tracking-[0.12em] text-white"
+          className="font-display text-2xl tracking-[0.12em] text-(--text)"
         >
           AUTO
           <span className="text-(--gold)">STORE</span>

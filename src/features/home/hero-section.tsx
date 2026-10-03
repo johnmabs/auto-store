@@ -23,13 +23,13 @@ export function HeroSection() {
             </span>
           </div>
 
-          <h1 className="mt-8 max-w-4xl font-display text-5xl leading-[0.95] tracking-wide text-white sm:text-6xl lg:text-7xl">
+          <h1 className="mt-8 max-w-4xl font-display text-5xl leading-[0.95] tracking-wide text-(--text) sm:text-6xl lg:text-7xl">
             TROUVEZ VOTRE
             <span className="block text-gold-500">PROCHAIN VÉHICULE</span>
             AU CONGO
           </h1>
 
-          <p className="mt-7 max-w-xl text-base leading-7 text-dark-300 sm:text-lg">
+          <p className="mt-7 max-w-xl text-base leading-7 text-(--muted) sm:text-lg">
             Des véhicules d&apos;occasion disponibles à Pointe-Noire et
             Brazzaville, en transit ou accessibles à l&apos;importation depuis
             nos marchés partenaires.
@@ -38,7 +38,7 @@ export function HeroSection() {
           <div className="mt-9 flex flex-wrap gap-4">
             <Link
               href="/vehicles"
-              className="group inline-flex items-center gap-3 rounded-xl bg-gold-500 px-6 py-3.5 text-sm font-bold text-dark-950 transition hover:bg-gold-400"
+              className="group inline-flex items-center gap-3 rounded-xl bg-gold-500 px-6 py-3.5 text-sm font-bold text-(--muted) transition hover:bg-gold-400"
             >
               Voir les véhicules
               <span
@@ -51,7 +51,7 @@ export function HeroSection() {
 
             <Link
               href="/vehicles?location=IN_CONGO"
-              className="inline-flex items-center rounded-xl border border-dark-700 bg-dark-900/70 px-6 py-3.5 text-sm font-semibold text-white transition hover:border-gold-500/40 hover:bg-dark-800"
+              className="inline-flex items-center rounded-xl border border-(--border) bg-(--bg) px-6 py-3.5 text-sm font-semibold text-(--text) transition hover:border-gold-500/40 hover:bg-(--bg)/50"
             >
               Disponibles au Congo
             </Link>
@@ -60,7 +60,7 @@ export function HeroSection() {
           <form
             action="/vehicles"
             method="get"
-            className="mt-10 flex max-w-xl overflow-hidden rounded-xl border border-dark-700 bg-dark-900"
+            className="mt-10 flex max-w-xl overflow-hidden rounded-xl border border-(--border) bg-(--bg)"
           >
             <label htmlFor="hero-search" className="sr-only">
               Rechercher un véhicule
@@ -71,35 +71,35 @@ export function HeroSection() {
               name="q"
               type="search"
               placeholder="Toyota Prado, BMW X5, Mercedes..."
-              className="min-w-0 flex-1 bg-transparent px-5 py-4 text-sm text-white outline-none placeholder:text-dark-500"
+              className="min-w-0 flex-1 bg-transparent px-5 py-4 text-sm text-(--text) outline-none placeholder:text-(--muted)"
             />
 
             <button
               type="submit"
-              className="border-l border-dark-700 px-6 text-sm font-semibold text-gold-400 transition hover:bg-dark-800"
+              className="border-l border-(--border) px-6 text-sm font-semibold text-gold-400 transition hover:bg-(--bg)/50"
             >
               Rechercher
             </button>
           </form>
 
-          <div className="mt-10 flex flex-wrap gap-x-10 gap-y-5 border-t border-dark-800 pt-7">
+          <div className="mt-10 flex flex-wrap gap-x-10 gap-y-5 border-t border-(--border) pt-7">
             <div>
-              <p className="font-display text-2xl text-white">CONGO</p>
-              <p className="mt-1 text-xs uppercase tracking-wider text-dark-500">
+              <p className="font-display text-2xl text-(--text)">CONGO</p>
+              <p className="mt-1 text-xs uppercase tracking-wider text-(--muted)">
                 Stock local
               </p>
             </div>
 
             <div>
-              <p className="font-display text-2xl text-white">IMPORT</p>
-              <p className="mt-1 text-xs uppercase tracking-wider text-dark-500">
+              <p className="font-display text-2xl text-(--text)">IMPORT</p>
+              <p className="mt-1 text-xs uppercase tracking-wider text-(--muted)">
                 Marchés internationaux
               </p>
             </div>
 
             <div>
-              <p className="font-display text-2xl text-white">SUIVI</p>
-              <p className="mt-1 text-xs uppercase tracking-wider text-dark-500">
+              <p className="font-display text-2xl text-(--text)">SUIVI</p>
+              <p className="mt-1 text-xs uppercase tracking-wider text-(--muted)">
                 Jusqu&apos;à la livraison
               </p>
             </div>
@@ -109,24 +109,24 @@ export function HeroSection() {
         <div className="relative hidden min-h-130 lg:block">
           <div className="absolute inset-8 rounded-[3rem] border border-gold-500/10 bg-linear-to-br from-gold-500/10 via-transparent to-transparent" />
 
-          <div className="absolute left-8 top-14 w-[80%] rounded-3xl border border-dark-700 bg-dark-900/80 p-7 shadow-2xl backdrop-blur">
+          <div className="absolute left-8 top-14 w-[80%] rounded-3xl border border-(--border) bg-(--bg) p-7 shadow-2xl backdrop-blur">
             <p className="text-xs uppercase tracking-[0.2em] text-gold-500">
               Auto Store
             </p>
 
-            <p className="mt-4 font-display text-5xl leading-none text-white">
+            <p className="mt-4 font-display text-5xl leading-none text-(--text)">
               VÉHICULES
               <br />
               SÉLECTIONNÉS
             </p>
 
-            <p className="mt-5 max-w-sm text-sm leading-6 text-dark-400">
+            <p className="mt-5 max-w-sm text-sm leading-6 text-(--muted)">
               Des modèles choisis selon leur état, leur provenance et leur
               pertinence pour le marché congolais.
             </p>
           </div>
 
-          <div className="absolute bottom-14 right-0 w-[72%] rounded-2xl border border-gold-500/20 bg-gold-500 p-6 text-dark-950 shadow-2xl">
+          <div className="absolute bottom-14 right-0 w-[72%] rounded-2xl border border-gold-500/20 bg-gold-500 p-6 text-(--bg) shadow-2xl">
             <p className="text-xs font-bold uppercase tracking-widest">
               Importation
             </p>

@@ -572,7 +572,7 @@ export default async function VehiclesPage({
           <div className="flex items-end gap-2">
             <button
               type="submit"
-              className="rounded-lg bg-black px-4 py-2 text-white"
+              className="rounded-lg bg-(--bg) px-4 py-2 text-(--text)"
             >
               Filtrer
             </button>

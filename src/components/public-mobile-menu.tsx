@@ -14,7 +14,7 @@ export function PublicMobileMenu() {
         onClick={() => setOpen((current) => !current)}
         aria-expanded={open}
         aria-controls="mobile-navigation"
-        className="rounded-lg border border-dark-700 px-3 py-2 text-xs uppercase tracking-wider text-dark-200"
+        className="rounded-lg border border-(--border) px-3 py-2 text-xs uppercase tracking-wider text-(--muted)"
       >
         {open ? "Fermer" : "Menu"}
       </button>
@@ -22,7 +22,7 @@ export function PublicMobileMenu() {
       {open && (
         <div
           id="mobile-navigation"
-          className="absolute inset-x-0 top-full border-b border-dark-800 bg-dark-950"
+          className="absolute inset-x-0 top-full border-b border-(--border) bg-(--bg)"
         >
           <nav className="mx-auto flex max-w-7xl flex-col px-6 py-5">
             {[
@@ -35,7 +35,7 @@ export function PublicMobileMenu() {
                 key={href}
                 href={href}
                 onClick={() => setOpen(false)}
-                className="border-b border-dark-800 py-4 text-sm uppercase tracking-wider text-dark-300 last:border-0 hover:text-gold-500"
+                className="border-b border-(--border) py-4 text-sm uppercase tracking-wider text-(--text) last:border-0 hover:text-gold-500"
               >
                 {label}
               </Link>

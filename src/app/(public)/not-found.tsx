@@ -14,7 +14,7 @@ export default function PublicNotFound() {
       </p>
 
       <div className="mt-6 flex flex-wrap justify-center gap-3">
-        <Link href="/" className="rounded-lg bg-black px-4 py-2 text-white">
+        <Link href="/" className="rounded-lg bg-(--bg) px-4 py-2 text-(--text)">
           Retour à l&apos;accueil
         </Link>
 

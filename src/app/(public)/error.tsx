@@ -17,7 +17,7 @@ export default function PublicError({
       <button
         type="button"
         onClick={() => reset()}
-        className="mt-6 rounded-lg bg-black px-4 py-2 text-white"
+        className="mt-6 rounded-lg bg-(--bg) px-4 py-2 text-(--text)"
       >
         Réessayer
       </button>

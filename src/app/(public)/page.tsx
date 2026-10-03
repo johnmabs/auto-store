@@ -20,13 +20,13 @@ export default async function HomePage() {
     <main>
       <HeroSection />
 
-      <section className="bg-dark-950 px-6 py-24">
+      <section className="bg-(--bg) px-6 py-24">
         <section className="mx-auto max-w-7xl px-6 py-16">
           <div className="flex items-end justify-between gap-6">
             <div>
               <h2 className="text-3xl font-bold">Véhicules en vedette</h2>
 
-              <p className="mt-2 text-neutral-600">
+              <p className="mt-2 text-(--muted)">
                 Une sélection de véhicules actuellement disponibles.
               </p>
             </div>
